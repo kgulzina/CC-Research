@@ -2,7 +2,7 @@
 # Simulate X = {x_1, x_2, ... , x_n} where each x_i is a vector of length T+1,
 # s.t length(x_i)=T+1. X ~ GP(0, Sigma). Sigma is AR(1) with rho=0.95
 
-library(MASS)
+library(MASS) #github
 library(mvtnorm)
 library(Matrix)
 
