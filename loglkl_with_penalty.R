@@ -167,12 +167,12 @@ opt2$par
 pars2
 
 
-# automized optimization: 
-# to see the estimates using any likelihood function for range of Times:
-## now our goal is to increase te precision: calculate gradient
-calc_gradient <- function(w,d,epsilon=10^-8){
+
+# add numerical gradient to optim() 
+calc_gradient_num <- function(w,d,epsilon=10^-8){
+    # calculates the gradient numerically
     n <- length(w)
-    gr <- numeric(n) ## write the real gradient
+    gr <- numeric(n) 
     for(i in 1:n) {
         h <- rep(0,n); h[i] <- epsilon
         gr[i] <- (loglkl_mvn_penalty(w+h,d)-
@@ -181,11 +181,17 @@ calc_gradient <- function(w,d,epsilon=10^-8){
     return(gr)
 }
 
+# add theoretical gradient to optim() 
+
+
+
 # set seed?????
 ## R style guide : READ, Hadley Wickham & google
 
 
-estimate_w <- function(Time, n, opt_f, gr) { # input gradient, pars, and data
+
+estimate_w <- function(Time, n, opt_f, gr) { 
+    # input gradient, pars, and data
     sigma <- Sigma(Time+1, rho = 0.95)
     
     # simulate
