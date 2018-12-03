@@ -2,17 +2,19 @@
 library(MASS)
 library(mvtnorm)
 library(Matrix)
+library(tmvtnorm)
 
 ## goals: 
 # Optimize functions with loops: remove c() >> Done
 # Increase the penalty: rho = 0.99 >> Done
 # Set white noise variance: sigmasq = 1 
-# Change w(t) from deterministic to sampled
+# Change w(t) from deterministic to sampled >> Done
+## simulated w(t) from truncated MVN
 # Remove constants from functions, split variables >> Done
 # R style guide: make changes ...
 # Split functions into different files ... 
 # Derive the real gradient function 
-# Assess the accuracy of optim with different pars
+# Assess the accuracy of optim with different pars >> Done
 
 
 
@@ -65,7 +67,10 @@ omega <- calc_corr(x_values, Time, n)
 # simulate W's
 simulate_w <- function(t){
     sigma <- 1/(0.36)*Sigma(t+1, 0.99)
-    w <- mvrnorm(1, rep(0, t+1), sigma)
+    # simulate from truncated normal
+    w <- rtmvnorm(1, rep(0, t+1), sigma, lower = rep(0, t+1), 
+                  upper = rep(Inf, t+1), algorithm = "gibbs")
+    #w <- mvrnorm(1, rep(0, t+1), sigma)
     return(w)
 }
 
@@ -240,12 +245,12 @@ simulate_d <- function(Time, n, w){
     
 }
 
-w <- simulate_w(10) # time 
-d <- simulate_d(10, 100, w) # time, n
+w <- simulate_w(5) # time 
+d <- simulate_d(5, 100, w) # time, n
 
 
 # constant term: pars
-pars <- seq(1, 1/(10+1), len = 10+1) # for input
+pars <- seq(1, 1/(5+1), len = 5+1) # for input
 
 
 estimate_w <- function(opt_f, grad, pars, d) { 
@@ -262,6 +267,11 @@ estimate_w <- function(opt_f, grad, pars, d) {
 
 estimate_w(loglkl_mvn_penalty, calc_gradient_num, pars, d)
 estimate_w(loglkl_mvn_penalty, calc_gradient_num, w, d)
+# the pretty same results 
+
+
+#### new concerns.. should get rid of negative weights?
+
 
 
 
