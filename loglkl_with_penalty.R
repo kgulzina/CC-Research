@@ -4,9 +4,9 @@ library(mvtnorm)
 library(Matrix)
 
 ## goals: 
-# Optimize functions with loops: remove c() 
-# Increase the penalty: rho = 0.99
-# Set white noise variance: sigmasq = 1
+# Optimize functions with loops: remove c() >> Done
+# Increase the penalty: rho = 0.99 >> Done
+# Set white noise variance: sigmasq = 1 
 # Change w(t) from deterministic to sampled
 # Remove constants from functions, split variables
 # R style guide: make changes
@@ -90,16 +90,17 @@ d <- cbind(x_values,t(y)) #colnames(d) <- c("t0", "t1", "y")
 # w(t)=rho*w(t-1) + z_t, z_t ~ N(0,sigma_square)
 # to find sigma_square:
 find_sigmasq <- function(rho, t){
-    z <- c() # change
     time <- seq(0, t, by = 1)
     v <- (t-time+1)/(t+1)
-    for(i in 1:(length(v)-1)) {
+    n <- length(v)
+    z <- numeric(n-1) 
+    for(i in 1:(n-1)) {
         z[i] <- v[i+1]-rho*v[i]
     }
     return(var(z))
 }
 
-find_sigmasq(0.8, 2)
+find_sigmasq(0.99, 2)
 
 # need omega -- general w/ w(t) as a vector. 
 gcalc_corr <- function(d,w) { #retriev x's from d
@@ -129,9 +130,9 @@ loglkl_mvn_penalty <- function(w,d) { #
     # calculate the covariance matrix for yw
     omega <- gcalc_corr(d,w)
     # find sigma_square for the prior covariance matrix
-    ssq <- find_sigmasq(0.8, time)
+    ssq <- find_sigmasq(0.99, time)
     # calculate the covariance matrix for w
-    sigma <- ssq/(0.36)*Sigma(time+1, 0.8) ## remove constants
+    sigma <- ssq/(0.36)*Sigma(time+1, 0.99) ## remove constants
     
     # data model: log_likelihood 
     p_yw <- dmvnorm(d[,ncol(d)], mean = rep(0, nrow(d)), sigma = omega, log = TRUE)  
@@ -181,20 +182,15 @@ calc_gradient_num <- function(w,d,epsilon=10^-8){
     return(gr)
 }
 
-# add theoretical gradient to optim() 
 
+######## Automation ##########
 
-
-# set seed?????
-## R style guide : READ, Hadley Wickham & google
-
-
-
-estimate_w <- function(Time, n, opt_f, gr) { 
-    # input gradient, pars, and data
+# constant terms: simuated data
+simulate_d <- function(Time, n){
+    
     sigma <- Sigma(Time+1, rho = 0.95)
     
-    # simulate
+    # simulate X's
     x_values <- mvrnorm(n, rep(0, Time+1), sigma)
     
     #calculate omega for Y
@@ -206,23 +202,29 @@ estimate_w <- function(Time, n, opt_f, gr) {
     # combine datasets: functional input and scale output
     d <- cbind(x_values,t(y))
     
-    # set initial values for the parameters
-    pars <- seq(1, 1/(Time+1), len = Time+1)
-    #pars <- seq(1,0.001, len = Time+1) #-- close to true parameters
+    return(d)
     
-    # find gradient
-    #gr <- calc_gradient(w,d)
+}
+
+d <- simulate_d(10, 100)
+
+
+# constant term: pars
+pars <- seq(1, 1/(Time+1), len = Time+1) # true ones
+
+
+estimate_w <- function(opt_f, grad, pars, d) { 
     
-    # optimize
+    # returns optim() output with tru parameter values
     opt <- optim(par = pars, opt_f, d = d, control = list(fnscale = -1,
                                                      maxit=10000),
-                 gr = gr) # added gradient function
+                 gr = grad) # added gradient function
     
     print(pars)
     return(opt)
 }
 
-estimate_w(10, 100, loglkl_mvn_penalty, calc_gradient)
+estimate_w(loglkl_mvn_penalty, calc_gradient)
 
 
 
