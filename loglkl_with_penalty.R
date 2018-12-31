@@ -245,12 +245,12 @@ simulate_d <- function(Time, n, w){
     
 }
 
-w <- simulate_w(5) # time 
-d <- simulate_d(5, 100, w) # time, n
+w <- simulate_w(10) # time 
+d <- simulate_d(10, 100, w) # time, n
 
 
 # constant term: pars
-pars <- seq(1, 1/(5+1), len = 5+1) # for input
+pars <- seq(1, 1/(10+1), len = 10+1) # for input
 
 
 estimate_w <- function(opt_f, grad, pars, d) { 
@@ -270,7 +270,11 @@ estimate_w(loglkl_mvn_penalty, calc_gradient_num, w, d)
 # the pretty same results 
 
 
+# comments:
 #### new concerns.. should get rid of negative weights?
+#### truncate or not truncated? 
+#### trying 365 on server:  Error in checkSymmetricPositiveDefinite(sigma) : 
+#sigma must be positive definite ???
 
 
 
