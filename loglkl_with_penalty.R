@@ -4,19 +4,6 @@ library(mvtnorm)
 library(Matrix)
 library(tmvtnorm)
 
-## goals: 
-# Optimize functions with loops: remove c() >> Done
-# Increase the penalty: rho = 0.99 >> Done
-# Set white noise variance: sigmasq = 1 
-# Change w(t) from deterministic to sampled >> Done
-## simulated w(t) from truncated MVN
-# Remove constants from functions, split variables >> Done
-# R style guide: make changes ...
-# Split functions into different files ... 
-# Derive the real gradient function 
-# Assess the accuracy of optim with different pars >> Done
-
-
 
 ## conventions: 
 # sample size and Time: T << n
