@@ -259,9 +259,9 @@ estimate_w(loglkl_mvn_penalty, calc_gradient_num, w, d)
 
 # comments:
 #### new concerns.. should get rid of negative weights?
-#### truncate or not truncated? 
+#### truncate or not truncated? >>> have to find new density functions
 #### trying 365 on server:  Error in checkSymmetricPositiveDefinite(sigma) : 
-#sigma must be positive definite ???
+#sigma must be positive definite ??? 
 
 
 
