@@ -13,9 +13,17 @@ library(tmvtnorm)
 ## conventions: 
 ## sample size and Time: T << n
 n <- 100
-Time <- 3 # if 1 -- cannot calculate the sigmasq
+Time <- 3 
 rho <- 0.99
 sigmasq <- 1
+
+## to use supplementary functions:
+source('supplementary_functions.R')
+
+## simulate weights:
+w <- simulate_w
+
+simulate_d(Time, n, )
 
 
 
