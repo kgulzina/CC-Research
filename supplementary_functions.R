@@ -178,6 +178,24 @@ simulate_d <- function(t, n, w){
 
 
 
+simulate_w <- function(t){
+# 
+#
+#
+#
+#
+    sigma <- 1/(0.36)*Sigma(t+1, 0.99)
+    # simulate from truncated normal
+    w <- rtmvnorm(1, rep(0, t+1), sigma, lower = rep(0, t+1), 
+                  upper = rep(Inf, t+1), algorithm = "gibbs")
+    #w <- mvrnorm(1, rep(0, t+1), sigma)
+    return(w)
+}
+
+
+
+
+
 
 
 
