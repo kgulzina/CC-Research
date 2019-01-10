@@ -196,6 +196,13 @@ simulate_w_trnctd <- function(t){
 
 
 
+simulate_log_w <- function(){
+    
+}
+
+
+
+
 
 estimate_w <- function(opt_f, grad, pars, d, maxit){ 
 # Estimates w using eBayes approach, i.e finds MLE estimates of w.
