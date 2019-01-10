@@ -13,13 +13,14 @@ library(tmvtnorm)
 ## conventions: 
 ## sample size and Time: T << n
 n <- 100
-Time <- 3 
+Time <- 10 
 rho <- 0.99
 sigmasq <- 1
 
 ## to use supplementary functions:
 source('supplementary_functions.R')
 source('loglkl_with_penalty.R')
+source("assess_accuracy.R")
 
 ## simulate weights:
 w <- simulate_w_trnctd(Time)
@@ -66,13 +67,21 @@ pars <- seq(1, 1/(Time+1), len = Time+1)
 pars
 
 ## compare two estimates with different initial values:
-estimate_w(loglkl_mvn_penalty, calc_gradient_num, pars, d, 10000)
-estimate_w(loglkl_mvn_penalty, calc_gradient_num, w, d, 10000)
+est1 <- estimate_w(loglkl_mvn_penalty, calc_gradient_num, pars, d, 10000)
+est2 <- estimate_w(loglkl_mvn_penalty, calc_gradient_num, w, d, 10000)
+
+# difference in estimates:
+diff_btw_estimates(est1$par, est2$par)
+
+# plot
+plot_residuals(est1$par, est2$par)
 
 
 ## NEW:
-# we can treat the difference between the true values of w and its estimates
-# as residuals, and test for normality ~ N(0, sigmasq) 
+## Concern: there is small discrepancy in estimates, so optim() might be 
+## converging to local maxima. To find out, we get 3D plot:
+
+
 
 
 
