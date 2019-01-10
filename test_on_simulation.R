@@ -19,6 +19,7 @@ sigmasq <- 1
 
 ## to use supplementary functions:
 source('supplementary_functions.R')
+source('loglkl_with_penalty.R')
 
 ## simulate weights:
 w <- simulate_w_trnctd(Time)
@@ -59,7 +60,19 @@ plot(to_check$x0, to_check$x1, col = to_check$colors)
 ##### close dots (dy distance) should be of the same color #####
 
 
-## 
+
+## initial values:
+pars <- seq(1, 1/(Time+1), len = Time+1)
+pars
+
+## compare two estimates with different initial values:
+estimate_w(loglkl_mvn_penalty, calc_gradient_num, pars, d, 10000)
+estimate_w(loglkl_mvn_penalty, calc_gradient_num, w, d, 10000)
+
+
+## NEW:
+# we can treat the difference between the true values of w and its estimates
+# as residuals, and test for normality ~ N(0, sigmasq) 
 
 
 
