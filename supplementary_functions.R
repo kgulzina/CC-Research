@@ -66,7 +66,7 @@ calc_corr_sampled <- function(X, t, n, w){
     time <- 0:t
     for(i in 1:n) {
         for(j in 1:n) {
-            omega[i,j] <- exp(-sum(w*(val[i,]-val[j,])^2))
+            omega[i,j] <- exp(-sum(w*(X[i,]-X[j,])^2))
         }
     }
     return(omega)
@@ -96,27 +96,6 @@ gcalc_corr <- function(d,w) { #retriev x's from d
         }
     }
     return(omega)
-}
-
-
-
-
-sim_truncated_w <- function(t){
-# Simulated weights in covariance function of GP (not deterministic) from 
-# truncated MVN (see assumptions in "CC-Process" log-file)
-#
-# Args: 
-#   t: time(T) or length(X)-1
-#
-# Output:
-#   w: weights, in a vector form
-    
-    sigma <- 1/(0.36)*Sigma(t+1, 0.99)
-    # simulate from specific density
-    w <- rtmvnorm(1, rep(0, t+1), sigma, lower = rep(0, t+1), 
-                  upper = rep(Inf, t+1), algorithm = "gibbs")
-    # w <- mvrnorm(1, rep(0, t+1), sigma)
-    return(w)
 }
 
 
@@ -158,13 +137,13 @@ simulate_d <- function(t, n, w){
 # Outputs:
 # d: data frame, last column is response Y, others are input X's 
     
-    sigma <- Sigma(t+1, rho = 0.95)
+    sigma <- calc_Sigma(t+1, rho = 0.95)
     
     # simulate X's
     x_values <- mvrnorm(n, rep(0, t+1), sigma)
     
     #calculate omega for Y
-    omega <- calc_corr2(x_values, t, n, w)
+    omega <- calc_corr_sampled(x_values, t, n, w)
     
     # simulate Y's
     y <- rmvnorm(1, mean = rep(0, n), sigma = omega)
@@ -178,18 +157,69 @@ simulate_d <- function(t, n, w){
 
 
 
-simulate_w <- function(t){
-# 
+simulate_w_mvn <- function(t){
+# Simulates weights from MVN ~ (GP), according to assumption in 
+# CC-Process - 1c
 #
+# Args:
+#   t: Time(T) or length(X)-1
 #
+# Output:
+#   w: weights, in a vector form
+    
+    sigma <- 1/(0.36)*calc_Sigma(t+1, 0.99)
+    # sigma depends on t, so not constant
+    w <- mvrnorm(1, rep(0, t+1), sigma)
+    return(w)
+}
+
+
+
+
+simulate_w_trnctd <- function(t){
+# Simulates weights from truncated (positive) MVN ~ (GP), according to 
+# the assumptions in CC-Process - 1c
+#    
+# Args:
+#   t: Time(T) or length(X)-1
 #
-#
-    sigma <- 1/(0.36)*Sigma(t+1, 0.99)
-    # simulate from truncated normal
+# Output:
+#   w: weights, in a vector form
+    
+    sigma <- 1/(0.36)*calc_Sigma(t+1, 0.99)
+    # sigma depends on t, so not constant
     w <- rtmvnorm(1, rep(0, t+1), sigma, lower = rep(0, t+1), 
                   upper = rep(Inf, t+1), algorithm = "gibbs")
-    #w <- mvrnorm(1, rep(0, t+1), sigma)
     return(w)
+}
+
+
+
+
+
+estimate_w <- function(opt_f, grad, pars, d, maxit){ 
+# Estimates w using eBayes approach, i.e finds MLE estimates of w.
+#    
+# Args:   
+#   opt_f: likelihood function to be optimized
+#   grad:  gradient of opt_f
+#   pars:  initial values for w
+#   d:     observed data
+#   maxit: maximum number of iterations
+#
+# Output: 
+#   opt:   results of optim() 
+    
+    opt <- optim(par = pars, opt_f, d = d, control = list(fnscale = -1,
+                                                          maxit=maxit),
+                 gr = grad) 
+    
+    # print true values of w
+    print("True values of w")
+    print(w)
+    
+    # estimated w
+    return(opt)
 }
 
 
