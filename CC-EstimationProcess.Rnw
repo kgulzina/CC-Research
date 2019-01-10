@@ -115,6 +115,15 @@ calc_gradient_num <- function(f,w,d,epsilon=10^-8){
 
 @
     
+    To sample weights wisely we could find a distribution which takes into account facts about the structure of $w$: \begin{enumerate} 
+    \item Highly correlated weights, with possibly AR(1) structure
+    \item Concentrated around zero
+    \item Skewed to the right
+    \item Positive s.t $0\leq w\leq 1$
+\end{enumerate}
+
+    There are some processes that likely to follow these characteristics. One is \textbf{Beta AR(1)} process model, which has the following structure: (cited from internet/article) 
+    
     Also we can improve the optimization process by deriving the real gradient of log-likelihood function with penalty term. For that purpose we will utulize the method given in Rassmussen's book GP for ML. We will take the following steps: 
     
 <<>>=
