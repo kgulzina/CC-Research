@@ -6,16 +6,6 @@ library(tmvtnorm)
 
 
 
-# Sigma: covariance matrix for AR(1)
-#Sigma <- function(t, rho){ # t:vector size; rho is fixed
-    #sigma <- matrix(NA, nrow = t, ncol = t)
-    #for(i in 1:t){
-        #for(j in 1:t){
-            #sigma[i,j] <- rho^abs(i-j)
-        #}
-    #}
-    #return(sigma)
-#}
 
 
 
@@ -129,10 +119,6 @@ loglkl_mvn_penalty <- function(w,d) { #
 }
 
 
-# w = (w_0, w_1, ... , w_100)
-# set initial values for the parameters
-#pars <- seq(1, 1/(Time+1), len = Time+1)
-#pars2 <- seq(1,0.001, len = Time+1) #gives approximately the same results!
 
 # use log_likelihood w/ penalty:
 #opt <- optim(par = pars, loglkl_mvn_penalty, d = d,
@@ -150,19 +136,6 @@ loglkl_mvn_penalty <- function(w,d) { #
 #pars2
 
 
-
-# add numerical gradient to optim() 
-#calc_gradient_num <- function(w,d,epsilon=10^-8){
-    # calculates the gradient numerically
- #   n <- length(w)
-  #  gr <- numeric(n) 
-   # for(i in 1:n) {
-    #    h <- rep(0,n); h[i] <- epsilon
-     #   gr[i] <- (loglkl_mvn_penalty(w+h,d)-
-      #                loglkl_mvn_penalty(w,d))/epsilon
-    #}
-    #return(gr)
-#}
 
 
 ######## Automation ##########
@@ -208,9 +181,6 @@ loglkl_mvn_penalty <- function(w,d) { #
   #  return(opt)
 #}
 
-#estimate_w(loglkl_mvn_penalty, calc_gradient_num, pars, d)
-#estimate_w(loglkl_mvn_penalty, calc_gradient_num, w, d)
-# the pretty same results 
 
 
 # comments:
