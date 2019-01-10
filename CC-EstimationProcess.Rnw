@@ -6,7 +6,7 @@
 \maketitle
 \newpage
 
-\LaTeX
+Now we will begin by optimizing the log-likelihood function: 
 
 <<>>=
 1+1
