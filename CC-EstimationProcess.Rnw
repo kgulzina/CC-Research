@@ -88,7 +88,8 @@ calc_gradient_num <- function(f,w,d,epsilon=10^-8){
 # 
 # Args:
 #   f: function (log-likelihood function)
-#   d: data frame, last column is response Y, others are input X's
+#   d: data frame, last column is response Y, 
+#      others are input X's
 #   w: weights, in a vector form 
 #   
 # Output:
@@ -106,7 +107,7 @@ calc_gradient_num <- function(f,w,d,epsilon=10^-8){
 @
     Here $h$ is epsilon, given as an infinitesimally small number.
     
-    Taking into account assumption about density of weights, log-likelihood function and its gradient, we obtained estimates of $w$ which are reasonably close to the true weight parameters. However, there is a small concern about the estimates with different initial values used in optim(), so optim() might be converging to the local maxima. To see that, we can plot 3D graphs of log-likelihood using the functions given in 3D_plot_loglkl.R
+    Taking into account assumption about density of weights, log-likelihood function and its gradient, we obtained estimates of $w$ which are reasonably close to the true weight parameters. However, there is a small concern about the estimates with different initial values used in optim(), so optim() might be converging to the local maxima. To see that, we can plot 3D graphs of log-likelihood using the functions given in $3D\_plot\_loglkl.R$
     
     To better optimize the likelihood function, we will modify some assumptions about the model (specifically, weight parameter). We will transform $w_t$ into the log-scale s.t $$log(w) \sim N(-1 or -2, \Sigma)$$ Appropriate code is given below: 
 
@@ -120,8 +121,8 @@ calc_gradient_num <- function(f,w,d,epsilon=10^-8){
 
 @
     
-    As an ultimate measure of accuracy we can calculate the MSE for each method of estimation and different initial values. Appropriate lines of codes are given in assess_accuracy.R file and their implementation is given in test_on_simulation.R file
+    As an ultimate measure of accuracy we can calculate the MSE for each method of estimation and different initial values. Appropriate lines of codes are given in $assess\_accuracy.R$ file and their implementation is given in $test\_on\_simulation.R$ file
     
-    Last important part of optimization is a time required for the whole run of optim() function. Lines of codes for time assessment (in benchmark style) is given in the assess_runtime.R file
+    Last important part of optimization is a time required for the whole run of optim() function. Lines of codes for time assessment (in benchmark style) is given in the $assess\_runtime.R$ file
 
 \end{document}
