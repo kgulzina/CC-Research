@@ -10,6 +10,7 @@ My research goal is to build an emulator (i.e., surrogate) for the Water Erosion
 - Find a new distribution which takes into account facts about weights: 1. High correlation 2.Concentration around zero 3.Positiveness (Beta autoregressive process(?), or Gamma(?))
 - Transform w(t) into log scale: log(w) ~ MVN centered at -1 or -2
 - Matrix differentiation techniques: Book(!)/article(!)/Wolfram Alpha(?) - probably download
+- Write a function to assess the runtime of optim()
 
 
 
@@ -17,7 +18,7 @@ My research goal is to build an emulator (i.e., surrogate) for the Water Erosion
 ## In-progress
 - Following R-style guide
 - Writing an abstract
-- Writing a function to assess the accuracy of loglkl_with_penalty() with different pars, gradients
+- Writing log process of optimization
 - Plot 3D of loglkl_with_penalty holding all but two constant
 
 
@@ -32,3 +33,4 @@ My research goal is to build an emulator (i.e., surrogate) for the Water Erosion
 - Separated simulation from functions and other constants
 - A separate new "log" document was created to keep track of changes and experiments with simulated data and preliminary model assumptions
 - Removed constants from functions
+- Wrote a function to assess the accuracy of loglkl_with_penalty() with different pars, gradients
