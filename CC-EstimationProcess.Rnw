@@ -6,7 +6,10 @@
 \maketitle
 \newpage
 
-Now we will begin by optimizing the log-likelihood function: 
+    Now we will estimate weights by using eBayes approach. To do so, we will optimize the log-likelihood function using optim() function. More precisely, we will find values of weights which maximize the log-likelihood function. 
+    
+    As a first step, we have to define the log-likelihood function: $$L(w)=f(Y|w)= \prod_{i=1}^n f(y_i|w)$$ since we assume that $y_i$ are independent for $i = 1, ..., n$ 
+    
 
 <<>>=
 1+1
