@@ -1,4 +1,4 @@
-####### Complementary/supplementary fuctions #######
+######### Complementary/supplementary fuctions #########
 ## Author: stat_cat
 ## Date: 01/03/19
 
