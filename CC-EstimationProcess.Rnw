@@ -2,22 +2,29 @@
 \title{likelihoods}
 \author{GK}
 \date{\today}
+\usepackage{hyperref}
 \begin{document}
 \maketitle
 \newpage
 
     Now we will estimate weights by using eBayes approach. To do so, we will optimize the log-likelihood function using optim() function. More precisely, we will find values of weights which maximize the log-likelihood function. 
     
-    As a first step, we have to define the log-likelihood function: $$L(w)=f(Y|w)= \prod_{i=1}^n f(y_i|w)$$ since we assume that $y_i$ are independent for $i = 1, ..., n$ Hence, 
+    \vspace{4mm}
+    
+    As a \textbf{first step}, we have to define the log-likelihood function: $$L(w)=f(Y|w)= \prod_{i=1}^n f(y_i|w)$$ since we assume that $y_i$ are independent for $i = 1, ..., n$ Hence, 
     
     $$L(w)=(\frac{1}{(2\pi)^n det(\Sigma)})^{1/2}exp(-\frac{1}{2}(y'\Omega^{-1}y)$$ where $\Omega$ is function of weight: $w_i$.
     
     Given the likelihood funtion above, we know that maximizing the log of likelihood is the same as maximizing the likelihood. So, we will stick with log-likelihood function from there. 
     
-    As a next step, we will add penalty term to the log-likelihood function to smooth it and make estimation more efficient. 
+    \vspace{4mm}
+    
+    As a \textbf{next step}, we will add penalty term to the log-likelihood function to smooth it and make estimation more efficient. 
     
     We add a penalty on a function as structure of weight parameter defined in CC-Process 1c. Hence from our goal is to maximize log of the following joint likelihood function:
-    $$p(w,y) = p(y|w)p(w)$$ where $p(y|w)$ is a data model, i.e $L(w)$ and $p(w)$ is already defined in CC-Process 1c s.t $$p(y|w) = N(y;0,\Omega(X, w))$$ $$p(w)=N(w;0,\Pi)$$ 
+    $$p(w,y) = p(y|w)p(w)$$ where $p(y|w)$ is a data model, i.e $L(w)$ and $p(w)$ is already defined in CC-Process 1c s.t $$p(y|w) = N(y;0,\Omega(X, w))$$ $$p(w)=N(w;0,\Pi)$$  
+    
+    \vspace{2mm}
     
     Note that this idea comes from LASSO or Ridge regression methods of parameter estimation. 
     
@@ -78,9 +85,9 @@ estimate_w <- function(opt_f, grad, pars, d, maxit){
 }
 @
 
-    Note that we have added gradient of log-likelihood function $f$ for better optimization. Since the differentitaion of the original likelihood function is way difficult, we tried first numerical (approximate) version of gradient: $$\bigtriangledown f=(f'_{w_0}, ..., f'_{w_T})$$ where $w = (w_0, ..., w_T)$. By the fundamentals of calculus we have that: $$f'_{w_i}(w_0, ..., w_T)=\lim_{h\to\infty}\frac{f(w_0, ..., w_i+h, ..., w_T) - f(w_0, ..., w_T)}{h}$$ 
+    \textbf{Note} that we have added gradient of log-likelihood function $f$ for better optimization. Since the differentitaion of the original likelihood function is way difficult, we tried first numerical (approximate) version of gradient: $$\bigtriangledown f=(f'_{w_0}, ..., f'_{w_T})$$ where $w = (w_0, ..., w_T)$. By the fundamentals of calculus we have that: $$f'_{w_i}(w_0, ..., w_T)=\lim_{h\to\infty}\frac{f(w_0, ..., w_i+h, ..., w_T) - f(w_0, ..., w_T)}{h}$$ 
     
-    We have implemented this theory as follows: 
+    We have implemented this in practice as follows: 
 
 <<>>=
 calc_gradient_num <- function(f,w,d,epsilon=10^-8){
@@ -107,13 +114,32 @@ calc_gradient_num <- function(f,w,d,epsilon=10^-8){
 @
     Here $h$ is epsilon, given as an infinitesimally small number.
     
-    Taking into account assumption about density of weights, log-likelihood function and its gradient, we obtained estimates of $w$ which are reasonably close to the true weight parameters. However, there is a small concern about the estimates with different initial values used in optim(), so optim() might be converging to the local maxima. To see that, we can plot 3D graphs of log-likelihood using the functions given in $3D\_plot\_loglkl.R$
+    \vspace{6mm}
     
-    To better optimize the likelihood function, we will modify some assumptions about the model (specifically, weight parameter). We will transform $w_t$ into the log-scale s.t $$log(w) \sim N(-1 or -2, \Sigma)$$ Appropriate code is given below: 
+    Taking into account assumption about density of weights, log-likelihood function and its gradient, we obtained estimates of $w$ which are reasonably close to the true weight parameters. However, there is a small concern about the estimates with different initial values used in optim(), so optim() might be converging to the local maxima. To see that, we can plot 3D graphs of log-likelihood using the functions given in $3D\_plot\_loglkl.R$ (!!! More work:  attach images, additionally code has to be refined)
+    
+    \vspace{6mm}
+    
+    To better optimize the likelihood function, we will modify some assumptions about the model (specifically, weight parameter). We will transform $w_t$ into the log-scale s.t $$log(w) \sim N(-1 or -2, \Sigma)$$      Following the simple rules of variable transformation, we have the following first result: \newline 
+    
+    \vspace{2mm}
+    
+    \begin{enumerate}
+    \item For $w=(w_0, ..., w_T)$ define $\theta=(\theta_0, ..., \theta_T)$ s.t $\theta_i=log(w_i)$. Hence, $\theta=log(w)=h(w)$ s.t $h^{-1}(\theta)=e^{\theta}=w$. Then $$p_{\theta}(\theta)=p_w(h^{-1}(\theta))\big|det J_{h^{-1}(\theta)}\big|$$ $$J_{h^{-1}(\theta)}=diag(e^{\theta_0}, ..., e^{\theta_T})$$ Hence, $$\big|det J_{h^{-1}(\theta)}\big|=\prod_{i=0}^{T}e^{\theta_i}=e^{\sum_{i=0}^{T}y_i}=e^{(T+1)\bar{\theta}}$$ $$p_{\theta}(\theta)=(2\pi)^{-(T+1)/2}(det\Pi)^{-1/2}e^{(T+1)\bar{\theta}}e^{-\frac{1}{2}(e^{\theta_0}, ..., e^{\theta_T})\Pi^{-1}(e^{\theta_0}, ..., e^{\theta_T})'}$$ \textbf{Note} that covariance matrix $\Pi$ used in the density formula is already defined in CC-Process 1c (for reference). We will sample $\theta$ from the distribution given above and convert sampled $\theta$'s to $w$: the variable of interest. For this purpose we employ MCMC method (using package 'mcmc' in R) to sample from not known density. Sample code is given in $supplementary\_functions.R$. Here is sample code: 
+    
+<<>>=
+
+@
+    
+    \item For $w=(w_0, ..., w_T)$ define $\theta=(\theta_0, ..., \theta_T)$ s.t $\theta_i=log(w_i)$. We will sample $\theta$ from the distribution given below and convert sampled $\theta$'s to $w$: the variable of interest. 
+    \end{enumerate}
+    
+    Appropriate code is given below: 
 
 <<>>=
 
 @
+    \vspace{3mm}
     
     To sample weights wisely we could find a distribution which takes into account facts about the structure of $w$: \begin{enumerate} 
     \item Highly correlated weights, with possibly AR(1) structure
@@ -122,7 +148,11 @@ calc_gradient_num <- function(f,w,d,epsilon=10^-8){
     \item Positive s.t $0\leq w\leq 1$
 \end{enumerate}
 
-    There are some processes that likely to follow these characteristics. One is \textbf{Beta AR(1)} process model, which has the following structure: (cited from internet/article) 
+    \vspace{2mm}
+    
+    There are some processes that likely to follow these characteristics. One is \textbf{Beta AR(1)} process model, which has the following structure: (cited from internet/article: \href{https://www.jstor.org/stable/2631528?seq=3#metadata_info_tab_contents}{An Autoregressive Process for Beta Random Variables, by E.Mackenzie} and \href{https://projecteuclid.org/download/pdfview_1/euclid.ba/1339878893}{Bayesian Model Selection for Beta Autoregressive Processes by R.Casarin}) 
+    
+    \vspace{6mm}
     
     Also we can improve the optimization process by deriving the real gradient of log-likelihood function with penalty term. For that purpose we will utulize the method given in Rassmussen's book GP for ML. We will take the following steps: 
     
@@ -130,7 +160,11 @@ calc_gradient_num <- function(f,w,d,epsilon=10^-8){
 
 @
     
+    \vspace{6mm}
+    
     As an ultimate measure of accuracy we can calculate the MSE for each method of estimation and different initial values. Appropriate lines of codes are given in $assess\_accuracy.R$ file and their implementation is given in $test\_on\_simulation.R$ file
+    
+    \vspace{6mm}
     
     Last important part of optimization is a time required for the whole run of optim() function. Lines of codes for time assessment (in benchmark style) is given in the $assess\_runtime.R$ file
 
