@@ -37,3 +37,10 @@ My research goal is to build an emulator (i.e., surrogate) for the Water Erosion
 - Plotted 3D of loglkl_with_penalty holding all but two constant (too lengthy)
 - Wrote a function to assess the accuracy of loglkl_with_penalty() with different pars, gradients
 - Changed w(t) into log scale: log(w) ~ MVN centered at -1 or -2
+
+
+### Commments: (01/14/19)
+- Tried to transform weights:w into log scale, found indeuced distribution, but had some difficulties: 1.Proposal distirbution 2.Stan
+- New weights sampled using log(w) dist with the same covariance matrix are reasonably good. Estimates are fair enough with the initial values as true values. However, another pars gives different results, so optim() might be converging to local minima again. Remedy?
+- Found (?)appropriate process for weights, as Beta AR(1), don't know how to implement this idea? >> more research
+- When T >> 250 optim() is not simply working, since \Pi and \Omega are becoming ND
