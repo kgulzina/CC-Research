@@ -120,25 +120,66 @@ calc_gradient_num <- function(f,w,d,epsilon=10^-8){
     
     \vspace{6mm}
     
-    To better optimize the likelihood function, we will modify some assumptions about the model (specifically, weight parameter). We will transform $w_t$ into the log-scale s.t $$log(w) \sim N(-1 or -2, \Sigma)$$      Following the simple rules of variable transformation, we have the following first result: \newline 
+    To better optimize the likelihood function, we will modify some assumptions about the model (specifically, weight parameter). We will transform $w_t$ into the log-scale s.t $$log(w)\sim N(-1 or -2,\Sigma)$$      Following the simple rules of variable transformation, we have the following first result: \newline 
     
     \vspace{2mm}
     
     \begin{enumerate}
-    \item For $w=(w_0, ..., w_T)$ define $\theta=(\theta_0, ..., \theta_T)$ s.t $\theta_i=log(w_i)$. Hence, $\theta=log(w)=h(w)$ s.t $h^{-1}(\theta)=e^{\theta}=w$. Then $$p_{\theta}(\theta)=p_w(h^{-1}(\theta))\big|det J_{h^{-1}(\theta)}\big|$$ $$J_{h^{-1}(\theta)}=diag(e^{\theta_0}, ..., e^{\theta_T})$$ Hence, $$\big|det J_{h^{-1}(\theta)}\big|=\prod_{i=0}^{T}e^{\theta_i}=e^{\sum_{i=0}^{T}y_i}=e^{(T+1)\bar{\theta}}$$ $$p_{\theta}(\theta)=(2\pi)^{-(T+1)/2}(det\Pi)^{-1/2}e^{(T+1)\bar{\theta}}e^{-\frac{1}{2}(e^{\theta_0}, ..., e^{\theta_T})\Pi^{-1}(e^{\theta_0}, ..., e^{\theta_T})'}$$ \textbf{Note} that covariance matrix $\Pi$ used in the density formula is already defined in CC-Process 1c (for reference). We will sample $\theta$ from the distribution given above and convert sampled $\theta$'s to $w$: the variable of interest. For this purpose we employ MCMC method (using package 'mcmc' in R) to sample from not known density. Sample code is given in $supplementary\_functions.R$. Here is sample code: 
+    \item For $w=(w_0, ..., w_T)$ define $\theta=(\theta_0, ..., \theta_T)$ s.t $\theta_i=log(w_i)$. Hence, $\theta=log(w)=h(w)$ s.t $h^{-1}(\theta)=e^{\theta}=w$. Then $$p_{\theta}(\theta)=p_w(h^{-1}(\theta))\big|det J_{h^{-1}(\theta)}\big|$$ $$J_{h^{-1}(\theta)}=diag(e^{\theta_0}, ..., e^{\theta_T})$$ Hence, $$\big|det J_{h^{-1}(\theta)}\big|=\prod_{i=0}^{T}e^{\theta_i}=e^{\sum_{i=0}^{T}y_i}=e^{(T+1)\bar{\theta}}$$ $$p_{\theta}(\theta)=(2\pi)^{-(T+1)/2}(det\Pi)^{-1/2}e^{(T+1)\bar{\theta}}e^{-\frac{1}{2}(e^{\theta_0}, ..., e^{\theta_T})\Pi^{-1}(e^{\theta_0}, ..., e^{\theta_T})'}$$ \textbf{Note} that covariance matrix $\Pi$ used in the density formula is already defined in CC-Process 1c (for reference). We will sample $\theta$ from the distribution given above and convert sampled $\theta$'s to $w$: the variable of interest. (For this purpose we would like to employ MCMC method (using package 'mcmc' in R) to sample from not known density. However, it requires teh output of density to be \textbf{scalar}, but we have a vector)
+    
+    Sampling multivariate r.v from unknown distribution can be done in two (for me) ways: 
+    1. By employing Metropolis-Hasting algorithm/Block-Wise sampling method (here I had a difficulty in finding the appropriate proposal distribution of the same dimension as a target distribution)
+    2. By employing "rstan" in R (I will probably try this method later, once I get acquainted with Stan)
+    
+    Sample code is given in $supplementary\_functions.R$. Here is sample code for approach 1:
     
 <<>>=
+## this function does not work right know
+simulate_log_w <- function(t){ 
+# Simulates log(weights) from transformed MVN ~ (GP) 
+# given in CC-Process 1c  
+# 
+# Args: 
+#   t: Time(T) or length(X)-1
+#
+# Output:
+#   w: weights, in a vector form
+    
+    # define the density
+    sigma <- 1/(0.36)*calc_Sigma(t+1, 0.99)
+    dens <- function(theta){
+        # theta is a vector of length T
+        result <- (2*pi)^(-(t+1)/2)*(det(sigma))^(-1/2)
+        *exp(sum(theta))*exp(-1/2*theta%*%solve(sigma)%*%t(theta))
+        return(result) ### need a scalar, not vector
+    }
+    
+    require(mcmc)
+    out <- metrop(dens, sigma, 1e+3)
+    return(out$batch)
+}
+
+## use this website to modify the above code
+# We would like to use MH at https://theclevermachine.wordpress.com/tag/multivariate-sampling-methods/ 
 
 @
     
-    \item For $w=(w_0, ..., w_T)$ define $\theta=(\theta_0, ..., \theta_T)$ s.t $\theta_i=log(w_i)$. We will sample $\theta$ from the distribution given below and convert sampled $\theta$'s to $w$: the variable of interest. 
+    Sample code for approach 2:
+<<>>=
+#STANNNNN
+@
+    
+    \item For $w=(w_0, ..., w_T)$ define $\theta=(\theta_0, ..., \theta_T)$ s.t $\theta_i=log(w_i)$. Here we will stick with the traditional (not proven) assumptions; since we want a density which takes into account high correlation among variables, we will leave covariance matrix structure $\Pi$ the same as AR(1). Hence, $$p_{\theta}(\theta) = MVN(\theta; -2, \Pi)$$ 
+    \textbf{Note} that mean = -2 can be adjusted (we may choose any in range (-5,-1) probably).
+    We will sample $\theta$ from the distribution given above and convert sampled $\theta$'s to $w$: the variable of interest.
+    
+    Sample code is given below: 
+
+<<>>=
+
+@
     \end{enumerate}
     
-    Appropriate code is given below: 
-
-<<>>=
-
-@
     \vspace{3mm}
     
     To sample weights wisely we could find a distribution which takes into account facts about the structure of $w$: \begin{enumerate} 
