@@ -17,9 +17,10 @@ My research goal is to build an emulator (i.e., surrogate) for the Water Erosion
 - Following R-style guide
 - Writing an abstract
 - Writing log process of optimization
-- Plot 3D of loglkl_with_penalty holding all but two constant
-- Transforming w(t) into log scale: log(w) ~ MVN centered at -1 or -2
-- Found a new distribution which takes into account facts about weights: 1. High correlation 2.Concentration around zero 3.Positiveness (Beta autoregressive process(?), or Gamma(?))
+
+- Find appropriate proposal distribution for Metropolis-Hastings algorithm/Block sampling method
+- Transform w into log(w), sample from induced distribution using Stan
+- Found a new distribution which takes into account facts about weights: 1. High correlation 2.Concentration around zero 3.Positiveness (Beta autoregressive process(yes), or Gamma(?)) >>>> But how to integrate it ??? <<<<
 
 
 
@@ -33,4 +34,6 @@ My research goal is to build an emulator (i.e., surrogate) for the Water Erosion
 - Separated simulation from functions and other constants
 - A separate new "log" document was created to keep track of changes and experiments with simulated data and preliminary model assumptions
 - Removed constants from functions
+- Plotted 3D of loglkl_with_penalty holding all but two constant (too lengthy)
 - Wrote a function to assess the accuracy of loglkl_with_penalty() with different pars, gradients
+- Changed w(t) into log scale: log(w) ~ MVN centered at -1 or -2
