@@ -196,8 +196,48 @@ simulate_w_trnctd <- function(t){
 
 
 
-simulate_log_w <- function(){
+simulate_log_w_stan <- function(t){ ## this function does not work right know
+# Simulates log(weights) from transformed MVN ~ (GP) given in CC-Process 1c  
+# and returns transformed result
+#    
+# Args: 
+#   t: Time(T) or length(X)-1
+#
+# Output:
+#   w: weights, in a vector form
     
+    # define the density
+    sigma <- 1/(0.36)*calc_Sigma(t+1, 0.99)
+    dens <- function(theta){
+        # theta is a vector of length T
+        result <- (2*pi)^(-(t+1)/2)*(det(sigma))^(-1/2)*exp(sum(theta))*
+            exp(-1/2*theta%*%solve(sigma)%*%t(theta))
+        return(result) ### need a scalar, not vector
+    }
+    
+    require(mcmc)
+    out <- metrop(dens, sigma, 1e+3)
+    return(out$batch)
+}
+
+
+
+
+simulate_log_w <- function(t){
+# Simulates log(weights) from  MVN(-2, Pi) given in CC-Process 1c and  
+# returns transformed result
+#    
+# Args: 
+#   t: Time(T) or length(X)-1
+#
+# Output:
+#   w: weights, in a vector form
+    
+    sigma <- 1/(0.36)*calc_Sigma(t+1, 0.99)
+    # sigma depends on t, so not constant
+    theta <- mvrnorm(1, rep(-3, t+1), sigma)
+    w <- exp(theta)
+    return(w)
 }
 
 
