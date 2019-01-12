@@ -15,7 +15,7 @@ library(lattice)
 ## conventions: 
 ## sample size and Time: T << n
 n <- 100
-Time <- 1 
+Time <- 5 
 rho <- 0.99
 sigmasq <- 1
 
@@ -28,6 +28,12 @@ source("3D_plot_loglkl.R")
 
 ## simulate weights:
 w <- simulate_w_trnctd(Time)
+
+## Approach 1 to simulate w:
+w1 <- simulate_log_w_stan(Time)
+
+## Approach 2 to simulate w:
+w <- simulate_log_w(Time) #current
 
 ## simulate data:
 d <- simulate_d(Time, n, w)
@@ -72,8 +78,10 @@ pars <- seq(1, 1/(Time+1), len = Time+1)
 pars
 
 ## compare two estimates with different initial values:
-est1 <- estimate_w(loglkl_mvn_penalty, calc_gradient_num, pars, d, 10000)
-est2 <- estimate_w(loglkl_mvn_penalty, calc_gradient_num, w, d, 10000)
+est1 <- estimate_w(loglkl_mvn_penalty, calc_gradient_num, pars, d, 100000)
+est1
+est2 <- estimate_w(loglkl_mvn_penalty, calc_gradient_num, w, d, 100000)
+est2
 
 # difference in estimates:
 diff_btw_estimates(est1$par, est2$par)
