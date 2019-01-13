@@ -14,7 +14,7 @@ library(lattice)
 
 ## conventions: 
 ## sample size and Time: T << n
-n <- 200
+n <- 100
 Time <- 5 
 rho <- 0.99
 sigmasq <- 1
@@ -123,6 +123,12 @@ lkl_plot(d)
 lkl_plot_col(d)
 
 
+### check the gradients:
+gr1 <- calc_gradient_num(loglkl_mvn_penalty, w, d, epsilon=10^-6)
+gr1
+
+gr2 <- gradient_loglkl_penalty(w, d)
+gr2
 
 
 
