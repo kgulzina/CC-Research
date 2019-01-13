@@ -120,6 +120,64 @@ loglkl_mvn_penalty <- function(w,d) { #
 
 
 
+
+
+gradient_loglkl_penalty <- function(w, d){
+# Calculates the gradient of f: log-likelihood with penalty w.r.t w
+#
+# Args: 
+#   w: weights, in a vector form
+#   d: data frame, last column is response Y, others are input X's
+#
+# Output:
+#   gr: gradients, in a vector form
+    
+    n <- length(w)
+    gr <- numeric(n)
+    
+    # omega
+    omega <- calc_corr_sampled(d[,-(n+1)], n-1, nrow(d), w)
+    
+    # inverse of omega
+    inv_omega <- solve(omega)
+    
+    for(i in 1:n) {
+        dm <- calc_mtrx_deriv(d[,-ncol(d)], n-1, nrow(d), w, i)
+        gr[i] <- -1/2*sum(diag(inv_omega%*%dm)) + 
+                  1/2*t(d[,n+1])%*%inv_omega%*%dm%*%inv_omega%*%d[,n+1]
+    }
+    
+    return(gr)
+                                                                                                                                                                                               
+}
+
+
+
+calc_mtrx_deriv <- function(X, t, n, w, k){
+# Calculates derivatives of matrix w.r.t one specific parameter
+#
+# Args:
+#   X: simulated, in a vector form
+#   t: time(T) or length(X) - 1
+#   n: sample size
+#   w: simulated weights, in a vector form 
+#   k: index of parameter vector, by which derivative is taken
+#
+# Output:
+#   dm: matrix of elementwise derivatives
+    
+    dm <- matrix(NA, nrow = n, ncol = n)
+    time <- 0:t
+    for(i in 1:n) {
+        for(j in 1:n) {
+            dm[i,j] <- -exp(-sum(w*(X[i,]-X[j,])^2))*((X[i,k]-X[j,k])^2)
+        }
+    }
+    return(dm)
+}
+
+
+
 # use log_likelihood w/ penalty:
 #opt <- optim(par = pars, loglkl_mvn_penalty, d = d,
  #             control = list(fnscale = -1, maxit=4000))
