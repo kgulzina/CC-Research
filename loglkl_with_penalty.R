@@ -141,10 +141,21 @@ gradient_loglkl_penalty <- function(w, d){
     # inverse of omega
     inv_omega <- solve(omega)
     
+    # inverse of pi
+    inv_pi <- solve(1/(0.36)*calc_Sigma(n, 0.99))
+    
     for(i in 1:n) {
         dm <- calc_mtrx_deriv(d[,-ncol(d)], n-1, nrow(d), w, i)
+        # for penalty term
+        dpenalty <- 0
+        for (j in 1:n){
+            temp = w[j]*(inv_pi[i,j] + inv_pi[j,i])
+            dpenalty <- dpenalty + temp
+        }
+        
         gr[i] <- -1/2*sum(diag(inv_omega%*%dm)) + 
-                  1/2*t(d[,n+1])%*%inv_omega%*%dm%*%inv_omega%*%d[,n+1]
+                  1/2*t(d[,n+1])%*%inv_omega%*%dm%*%inv_omega%*%d[,n+1] +
+                  -1/2*dpenalty
     }
     
     return(gr)
