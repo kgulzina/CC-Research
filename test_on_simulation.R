@@ -14,7 +14,7 @@ library(lattice)
 
 ## conventions: 
 ## sample size and Time: T << n
-n <- 100
+n <- 200
 Time <- 5 
 rho <- 0.99
 sigmasq <- 1
@@ -83,16 +83,36 @@ est1
 est2 <- estimate_w(loglkl_mvn_penalty, calc_gradient_num, w, d, 100000)
 est2
 
+
+
+## compare two estimates with different gradient and pars:
+est3 <- estimate_w(loglkl_mvn_penalty, gradient_loglkl_penalty, pars,
+                                      d, 100000)
+est3
+est4 <- estimate_w(loglkl_mvn_penalty, gradient_loglkl_penalty, w,
+                   d, 100000)
+est4
+
+
+### mse for different gradients
+mse(est2$par, w)
+mse(est4$par, w) ### No difference??? are you kidding? !!!! There is 
+## improvement in the runtime!!!!
+
+
+
+
 # difference in estimates:
 diff_btw_estimates(est1$par, est2$par)
 
 # plot of differences:
-plot_residuals(est1$par, est2$par)
+plot_residuals(est1$par, est2$par) 
 
 
 
 
-## NEW:
+
+## NEW: later
 ## Concern: there is small discrepancy in estimates, so optim() might be 
 ## converging to local maxima. To find out, we get 3D plot:
 
@@ -101,6 +121,10 @@ lkl_plot(d)
 
 # plot w/ color
 lkl_plot_col(d)
+
+
+
+
 
 
 
