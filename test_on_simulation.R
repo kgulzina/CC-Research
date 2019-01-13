@@ -14,8 +14,8 @@ library(lattice)
 
 ## conventions: 
 ## sample size and Time: T << n
-n <- 100
-Time <- 5 
+n <- 200
+Time <- 15 
 rho <- 0.99
 sigmasq <- 1
 
