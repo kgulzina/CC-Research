@@ -196,6 +196,14 @@ simulate_log_w <- function(t){
     \vspace{6mm}
     
     Also we can improve the optimization process by deriving the real gradient of log-likelihood function with penalty term. For that purpose we will utulize the method given in Rassmussen's book GP for ML. We will take the following steps: 
+    \begin{enumerate}
+    \item Function of interest for which we have to find gradient is log-likleihood with penalty term: $$log(p(w,y))=log(p(y|w))+log(p(w))$$ 
+    $$=log\Big(\big(\frac{1}{(2\pi)^n det(\Omega)}\big)^{1/2}e^{y'\Omega^{-1}y}\Big) + log\Big(\big(\frac{1}{(2\pi)^{T+1} det(\Pi)}\big)^{1/2}e^{w'\Pi^{-1}w}\Big)$$ where $\Pi$ is constant for a fixed Time($T$)
+    \item Parameter of interest, or the variable by which we have to calculate the gradient is $w=(w_0, ..., w_T)$ of length T+1.
+    \item We can notice that it is not difficult to derive the gradient, i.e first derivatives of log(p(w)) w.r.t w, since its structure reduced to quadratic polynomial after taking the log. 
+    \item We are interesed particularly in $$\frac{\partial log(p(w))}{\partial w_k}=0+0-\frac{1}{2}\frac{\partial(w'\Pi^{-1}w)}{\partial w_k}$$ We take a closer look: $$\frac{\partial(w'\Pi^{-1}w)}{\partial w_k}=$$ $$= -\frac{1}{2}\big(w_0\Pi_{00}^{-1} + w_1\Pi_{10}^{-1} + ... + w_T\Pi_{T0}^{-1}, ..., w_0\Pi_{0T}^{-1} + ... + w_T\Pi_{TT}^{-1}\big)\big(w_0, ..., w_T\big)'$$ 
+    $$= -\frac{1}{2}\big(\big)$$
+    \end{enumerate}
     
 <<>>=
 
