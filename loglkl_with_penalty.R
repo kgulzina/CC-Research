@@ -149,7 +149,7 @@ gradient_loglkl_penalty <- function(w, d){
         # for penalty term
         dpenalty <- 0
         for (j in 1:n){
-            temp = w[j]*(inv_pi[i,j] + inv_pi[j,i])
+            temp = -1/2*w[j]*(inv_pi[i,j] + inv_pi[j,i])
             dpenalty <- dpenalty + temp
         }
         
