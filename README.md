@@ -6,7 +6,7 @@ My research goal is to build an emulator (i.e., surrogate) for the Water Erosion
 
 
 ## Backlog
-- Write a function to assess the runtime of optim()
+- Write a function to assess the runtime of optim() ~ benchmark
 
 
 
@@ -39,7 +39,7 @@ My research goal is to build an emulator (i.e., surrogate) for the Water Erosion
 - Derived the real gradient function for maximization of loglkl_with_penalty()
 
 
-### Commments: (01/14/19)
+### Comments: (01/14/19)
 - Tried to transform weights:w into log scale, found induced distribution, but had some difficulties: 1.Proposal distribution 2.Stan
 - New weights sampled using log(w) dist with the same covariance matrix are reasonably good. Estimates are fair enough with the initial values as true values. However, another pars gives different results, so optim() might be converging to local maxima again. Remedy?
 - Found (?)appropriate process for weights, as Beta AR(1), don't know how to implement this idea? >> more research
