@@ -7,6 +7,11 @@ My research goal is to build an emulator (i.e., surrogate) for the Water Erosion
 
 ## Backlog
 - Write a function to assess the runtime of optim() ~ benchmark
+- Create a new file that contains all assumptions and estimation process
+- Choose font, size and style for the paper
+- Outline: How many pages, tables, figures and parts
+- (!)Correct the log_likelihood_with_penalty >>> make p(w) look like the one you used in simulation
+- Run the simulation and estimation on for T = 365 on server
 
 
 
@@ -16,8 +21,9 @@ My research goal is to build an emulator (i.e., surrogate) for the Water Erosion
 - Writing an abstract
 - Writing log process of optimization
 
-- Find appropriate proposal distribution for Metropolis-Hastings algorithm/Block sampling method
-- Transform w into log(w), sample from induced distribution using Stan
+- Find MoM estimators of weights: techniques ... ???
+
+(For later maybe)
 - Found a new distribution which takes into account facts about weights: 1. High correlation 2.Concentration around zero 3.Positiveness (Beta autoregressive process(yes), or Gamma(?)) >>>> But how to integrate it ??? <<<<
 
 
@@ -37,6 +43,8 @@ My research goal is to build an emulator (i.e., surrogate) for the Water Erosion
 - Changed w(t) into log scale: log(w) ~ MVN centered at -1 or -2
 - Matrix differentiation techniques: Book(yes)/article(yes)/Wolfram Alpha(no need) - probably download
 - Derived the real gradient function for maximization of loglkl_with_penalty()
+- Updated gradient function code
+- Tried new pars: simulated from AR(1)
 
 
 ### Comments: (01/14/19)
@@ -45,3 +53,7 @@ My research goal is to build an emulator (i.e., surrogate) for the Water Erosion
 - Found (?)appropriate process for weights, as Beta AR(1), don't know how to implement this idea? >> more research
 - When T >> 250 optim() is not simply working, since \Pi and \Omega are becoming ND. Remedy?
 - Tried new (true) gradient: estimates with initial values as true weights are exactly the same as with numerical gradient. However, there is a significant improvement in the runtime of optim() (!!!)
+
+### Comments: (02/04/19)
+- Deriving the gradient: changed the precision matrix. It should optimize the code and decrease the runtime. 
+- We changed the assumption that weights have to be within [0,1], while they probably will fall into this range, the real range is [0, \infty]
