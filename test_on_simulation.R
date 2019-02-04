@@ -14,8 +14,8 @@ library(lattice)
 
 ## conventions: 
 ## sample size and Time: T << n
-n <- 100
-Time <- 10
+n <- 300
+Time <- 5
 rho <- 0.99
 sigmasq <- 1
 
@@ -73,40 +73,62 @@ plot(to_check$x0, to_check$x1, col = to_check$colors)
 
 
 
-## set initial values:
-pars <- seq(1, 1/(Time+1), len = Time+1)
-pars
+## set initial values as strict line:
+pars1 <- seq(1, 1/(Time+1), len = Time+1)
+pars1
+
+## set initial values sampled from AR(1):
+pars2 <- simulate_log_w(Time)
+pars2
 
 ## compare two estimates with different initial values:
-est1 <- estimate_w(loglkl_mvn_penalty, calc_gradient_num, pars, d, 100000)
-est1
-est2 <- estimate_w(loglkl_mvn_penalty, calc_gradient_num, w, d, 100000)
-est2
+est_gr1_pars1 <- estimate_w(loglkl_mvn_penalty, calc_gradient_num, pars1, d, 100000)
+est_gr1_pars1
+
+est_gr1_pars2 <- estimate_w(loglkl_mvn_penalty, calc_gradient_num, pars2, d, 100000)
+est_gr1_pars2
+
+est_gr1_w <- estimate_w(loglkl_mvn_penalty, calc_gradient_num, w, d, 100000)
+est_gr1_w #initial values as true parameters
 
 
 
 ## compare two estimates with different gradient and pars:
-est3 <- estimate_w(loglkl_mvn_penalty, gradient_loglkl_penalty, pars,
+est_gr2_pars1 <- estimate_w(loglkl_mvn_penalty, gradient_loglkl_penalty, pars1,
                                       d, 100000)
-est3
-est4 <- estimate_w(loglkl_mvn_penalty, gradient_loglkl_penalty, w,
+est_gr2_pars1
+
+est4_gr2_pars2 <- estimate_w(loglkl_mvn_penalty, gradient_loglkl_penalty, pars2,
                    d, 100000)
-est4
+est_gr1_pars2
+# initial values as true parameters
+est4_gr2_w <- estimate_w(loglkl_mvn_penalty, gradient_loglkl_penalty, w,
+                             d, 100000)
+est_gr1_w
 
 
-### mse for different gradients
+
+########################################
+##### mse for different estimates ######
 mse(est2$par, w)
 mse(est4$par, w) ### No difference??? are you kidding? !!!! There is 
 ## improvement in the runtime!!!!
 
 
-
+# later!!
 
 # difference in estimates:
 diff_btw_estimates(est1$par, est2$par)
 
 # plot of differences:
 plot_residuals(est1$par, est2$par) 
+
+
+
+############# MoM #################
+mom_est <- gmm(g = loglkl_mvn_penalty, x = d, t0 = w, 
+               gradv = gradient_loglkl_penalty, optfct = "optim", 
+               itermax = 1000000)
 
 
 
@@ -123,12 +145,19 @@ lkl_plot(d)
 lkl_plot_col(d)
 
 
-### check the gradients:
+
+##########################################
+########## check the gradients ###########
+##########################################
+
 gr1 <- calc_gradient_num(loglkl_mvn_penalty, w, d, epsilon=10^-6)
 gr1
 
 gr2 <- gradient_loglkl_penalty(w, d)
 gr2
+
+# little bit discrepancy: is it due the new gradient? which one is causing
+# the discrepancy?
 
 
 
