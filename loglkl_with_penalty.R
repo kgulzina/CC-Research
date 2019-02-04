@@ -146,13 +146,25 @@ gradient_loglkl_penalty <- function(w, d){
     
     for(i in 1:n) {
         dm <- calc_mtrx_deriv(d[,-ncol(d)], n-1, nrow(d), w, i)
-        # for penalty term
-        dpenalty <- 0
-        for (j in 1:n){
-            temp = -1/2*w[j]*(inv_pi[i,j] + inv_pi[j,i])
-            dpenalty <- dpenalty + temp
+        # for penalty term: way 1
+        #dpenalty <- 0
+        #for (j in 1:n){
+        #    temp = -1/2*w[j]*(inv_pi[i,j] + inv_pi[j,i])
+        #    dpenalty <- dpenalty + temp
+        #}
+        
+        # for penalty term: way 2
+        if (!(i == 1 | i == n)) {
+            dpenalty <- -1/2*(w[i-1]*(inv_pi[i-1,i] + inv_pi[i,i-1]) +
+                              2*w[i]*inv_pi[i,i] +
+                              w[i+1]*(inv_pi[i+1,i] + inv_pi[i,i+1]))
         }
         
+        else {
+            dpenalty <- -w[i]*inv_pi[i,i]
+        }
+        
+        # final gradient
         gr[i] <- -1/2*sum(diag(inv_omega%*%dm)) + 
                   1/2*t(d[,n+1])%*%inv_omega%*%dm%*%inv_omega%*%d[,n+1] +
                   -1/2*dpenalty
