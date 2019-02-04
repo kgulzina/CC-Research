@@ -11,6 +11,7 @@ My research goal is to build an emulator (i.e., surrogate) for the Water Erosion
 - Choose font, size and style for the paper
 - Outline: How many pages, tables, figures and parts
 - (!)Correct the log_likelihood_with_penalty >>> make p(w) look like the one you used in simulation
+- Run the simulation and estimation on for T = 365 on server
 
 
 
