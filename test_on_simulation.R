@@ -4,6 +4,10 @@
 ## Date: 09/03/18 - present
 
 
+
+
+# Libraries ---------------------------------------------------------------
+
 library(MASS)
 library(mvtnorm)
 library(Matrix)
@@ -12,7 +16,10 @@ library(plotly)
 library(lattice)
 
 
-## conventions: 
+
+
+# Conventions -------------------------------------------------------------
+
 ## sample size and Time: T << n
 n <- 300
 Time <- 5
@@ -25,6 +32,10 @@ source('loglkl_with_penalty.R')
 source("assess_accuracy.R")
 source("3D_plot_loglkl.R")
 
+
+
+
+# Simulation --------------------------------------------------------------
 
 ## simulate weights:
 w <- simulate_w_trnctd(Time)
@@ -41,7 +52,8 @@ d <- simulate_d(Time, n, w)
 
 
 
-#### Some manipulations to see if Y's are sampled correctly ####
+# If Y’s are sampled correctly --------------------------------------------
+
 ## summary statistics and simple plot
 y <- d[,ncol(d)]
 summary(y)
@@ -73,6 +85,8 @@ plot(to_check$x0, to_check$x1, col = to_check$colors)
 
 
 
+# Initial values ----------------------------------------------------------
+
 ## set initial values as strict line:
 pars1 <- seq(1, 1/(Time+1), len = Time+1)
 pars1
@@ -80,6 +94,11 @@ pars1
 ## set initial values sampled from AR(1):
 pars2 <- simulate_log_w(Time)
 pars2
+
+
+
+
+# Estimation --------------------------------------------------------------
 
 ## compare two estimates with different initial values:
 est_gr1_pars1 <- estimate_w(loglkl_mvn_penalty, calc_gradient_num, pars1, d, 100000)
@@ -90,7 +109,6 @@ est_gr1_pars2
 
 est_gr1_w <- estimate_w(loglkl_mvn_penalty, calc_gradient_num, w, d, 100000)
 est_gr1_w #initial values as true parameters
-
 
 
 ## compare two estimates with different gradient and pars:
@@ -108,14 +126,11 @@ est_gr1_w
 
 
 
-########################################
-##### mse for different estimates ######
+
+# Assessment --------------------------------------------------------------
+
 mse(est2$par, w)
-mse(est4$par, w) ### No difference??? are you kidding? !!!! There is 
-## improvement in the runtime!!!!
-
-
-# later!!
+mse(est4$par, w) 
 
 # difference in estimates:
 diff_btw_estimates(est1$par, est2$par)
@@ -125,7 +140,9 @@ plot_residuals(est1$par, est2$par)
 
 
 
-############# MoM #################
+
+# MoM (alternative) -------------------------------------------------------
+
 mom_est <- gmm(g = loglkl_mvn_penalty, x = d, t0 = w, 
                gradv = gradient_loglkl_penalty, optfct = "optim", 
                itermax = 1000000)
@@ -133,6 +150,8 @@ mom_est <- gmm(g = loglkl_mvn_penalty, x = d, t0 = w,
 
 
 
+
+# Plots -------------------------------------------------------------------
 
 ## NEW: later
 ## Concern: there is small discrepancy in estimates, so optim() might be 
@@ -146,9 +165,8 @@ lkl_plot_col(d)
 
 
 
-##########################################
-########## check the gradients ###########
-##########################################
+
+# Gradients ---------------------------------------------------------------
 
 gr1 <- calc_gradient_num(loglkl_mvn_penalty, w, d, epsilon=10^-6)
 gr1
@@ -158,6 +176,13 @@ gr2
 
 # little bit discrepancy: is it due the new gradient? which one is causing
 # the discrepancy?
+
+
+
+
+
+# New estimation method ---------------------------------------------------
+
 
 
 
