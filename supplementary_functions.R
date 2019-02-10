@@ -273,6 +273,13 @@ estimate_w <- function(opt_f, grad, pars, d, maxit){
 
 
 
+generate_pars_by_range <- function() {
+# This function will generate 
+#
+#
+#
+#
+}
 
 
 
