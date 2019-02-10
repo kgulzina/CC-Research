@@ -21,8 +21,8 @@ library(lattice)
 # Conventions -------------------------------------------------------------
 
 ## sample size and Time: T << n
-n <- 300
-Time <- 5
+n <- 100
+Time <- 15
 rho <- 0.99
 sigmasq <- 1
 
@@ -183,11 +183,20 @@ gr2
 
 # New estimation method ---------------------------------------------------
 
+# We will divide parameters into ranges:
+# range1: {w_0, ..., w_4}
+est5_gr2_part1 <- estimate_w(loglkl_mvn_penalty, gradient_loglkl_penalty, pars2[1:8],
+                             d[,-(9:16)], 100000)
+est5_gr2_part1
 
+est5_gr2_part2 <- estimate_w(loglkl_mvn_penalty, gradient_loglkl_penalty, w[9:16],
+                             d[,-(1:8)], 100000)
+est5_gr2_part2
 
-
-
-
+pars3 <- c(est5_gr2_part1$par, est5_gr2_part2$par)
+est_gr2_pars3 <- estimate_w(loglkl_mvn_penalty, gradient_loglkl_penalty, pars3,
+                            d, 100000)
+est_gr2_pars3
 
 
 
