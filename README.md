@@ -12,6 +12,7 @@ My research goal is to build an emulator (i.e., surrogate) for the Water Erosion
 - Outline: How many pages, tables, figures and parts
 - (!)Correct the log_likelihood_with_penalty >>> make p(w) look like the one you used in simulation
 - Run the simulation and estimation on for T = 365 on server
+- Use thesis template and put everything together into one!!!!!!!
 
 
 
@@ -21,10 +22,11 @@ My research goal is to build an emulator (i.e., surrogate) for the Water Erosion
 - Writing an abstract
 - Writing log process of optimization
 
-- Find MoM estimators of weights: techniques ... ???
-
-(For later maybe)
-- Found a new distribution which takes into account facts about weights: 1. High correlation 2.Concentration around zero 3.Positiveness (Beta autoregressive process(yes), or Gamma(?)) >>>> But how to integrate it ??? <<<<
+- Collect the simulated data from STRIPS-1
+- Sensitivity analysis using paper of Prof. Morris
+- Try Tempering method suggested by Prof. Niemi
+- Decide on the optimal sample size
+- Try Prof. Morris's approach: use basis functions, dlm R-package, "Dynamic Linear Models with R" on Time Series. Choose optimal q = number of harmonics, where harmonics come in pairs. So you will have 2q number of parameters to estimate instead of 365. Book pages: {102, 103, 108} 
 
 
 
@@ -45,6 +47,9 @@ My research goal is to build an emulator (i.e., surrogate) for the Water Erosion
 - Derived the real gradient function for maximization of loglkl_with_penalty()
 - Updated gradient function code
 - Tried new pars: simulated from AR(1)
+- Found MoM estimators of weights: techniques, don't work well as I wanted
+- Found a new distribution which takes into account facts about weights: 1. High correlation 2.Concentration around zero 3.Positiveness :Beta autoregressive process -- did not work since it is spiky
+
 
 
 ### Comments: (01/14/19)
@@ -57,3 +62,12 @@ My research goal is to build an emulator (i.e., surrogate) for the Water Erosion
 ### Comments: (02/04/19)
 - Deriving the gradient: changed the precision matrix. It should optimize the code and decrease the runtime. 
 - We changed the assumption that weights have to be within [0,1], while they probably will fall into this range, the real range is [0, \infty]
+
+### Comments: (02/11/19)
+- There are three types of data: true, simulated, emulated
+- For some reason, dividing and splitting wasn't giving good results -- actually it went crazy
+- Miller's thesis contains sufficient information for the data generation
+- Abstract should be 12-30 pages without pictures and tables
+- There is a thesis template on the page of Prof. Niemi
+- You can code part containing MLE optim to the paper
+- Small steps do not have to be included in the paper
