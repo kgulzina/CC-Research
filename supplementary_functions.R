@@ -273,12 +273,44 @@ estimate_w <- function(opt_f, grad, pars, d, maxit){
 
 
 
-generate_pars_by_range <- function() {
-# This function will generate 
+generate_pars_by_range <- function(t, d, opt_f = loglkl_mvn_penalty, 
+    grad = gradient_loglkl_penalty, maxit = 10000) {
+# This function will generate initial values. Another papir of initial values # are sampled from AR(1), divided into quiantiles of 30 percents. New initial 
+# values are estimated using MLE method, and the new values are the target
+# initial values.
 #
+# Args:
+#   t:     Time(T) or length(X)-1
+#   d:     observed data
+#   opt_f: likelihood function to be optimized
+#   grad:  gradient of opt_f
+#   maxit: maximum number of iterations            
 #
-#
-#
+# Output:
+#   pars: initial values, in a vector form
+
+    # simulate pre-initial values
+    pars <- simulate_log_w(t)
+
+    # get legth of the range
+    ranges <- (t+1) %/% 3
+
+    # declare target initial values
+    result <- c()
+    k = 1
+
+    for (i in 1:3) {
+        if (i == 3) {
+            result[k:(t+1)] = estimate_w(opt_f, grad, pars[k:(t+1)], 
+            d[,c(k:(t+1), t+2], maxit)
+        } else {
+            result[k:(i*range)] = estimate_w(opt_f, grad, pars[k:(i*range)], 
+            d[,c(k:(i*range), t+2], maxit)
+        } 
+        k <- k + range 
+    }
+
+    return(result)
 }
 
 
