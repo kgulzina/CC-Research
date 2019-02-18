@@ -101,7 +101,7 @@ gcalc_corr <- function(d,w) { #retriev x's from d
 
 
 
-calc_gradient_num <- function(f,w,d,epsilon=10^-8){
+calc_gradient_num <- function(f,w,d,epsilon=10^-6){
 # Calculates the gradient of a function numerically
 # 
 # Args:
@@ -430,7 +430,7 @@ tempering_method <- function(k, opt_f, grad, pars, d, maxit) {
 
 
 
-dynamic_log_lkl_mvn_penalty <- function(w, d) {
+dynamic_loglkl_mvn_penalty <- function(w, d) {
 # Calculates the gradient of f: log-likelihood with penalty w.r.t w
 # One should use calc_gradient_numerically for optim()
 #
@@ -452,7 +452,7 @@ dynamic_log_lkl_mvn_penalty <- function(w, d) {
     p_yw <- dmvnorm(d[,ncol(d)], mean = rep(0, nrow(d)), sigma = omega, log = TRUE)  
     
     # prior on w: quarterly periodic, 6 pairs of harmonics
-    p_w <- dlmModTrig(s = 4, q = 6)
+    p_w <- dlmModTrig(s = 4, q = 2)
     
     # the posterior which will be maximized
     result <- p_yw + p_w
