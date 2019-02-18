@@ -7,22 +7,21 @@
 
 
 # Libraries ---------------------------------------------------------------
-
 library(MASS)
 library(mvtnorm)
 library(Matrix)
 library(tmvtnorm)
 library(plotly)
 library(lattice)
+library(dlm)
 
 
 
 
 # Conventions -------------------------------------------------------------
-
 ## sample size and Time: T << n
-n <- 1000 # for more sample size I am getting more stable estimates!
-Time <- 10
+n <- 100 # for more sample size I am getting more stable estimates!
+Time <- 15
 rho <- 0.99
 sigmasq <- 1
 
@@ -36,12 +35,11 @@ source("3D_plot_loglkl.R")
 
 
 # Simulation --------------------------------------------------------------
-
-## simulate weights:
-w <- simulate_w_trnctd(Time)
+## simulate weights using truncated mvn:
+#w <- simulate_w_trnctd(Time)
 
 ## Approach 1 to simulate w:
-w1 <- simulate_log_w_stan(Time)
+#w1 <- simulate_log_w_stan(Time)
 
 ## Approach 2 to simulate w:
 w <- simulate_log_w(Time) #current
@@ -53,7 +51,6 @@ d <- simulate_d(Time, n, w)
 
 
 # If Y’s are sampled correctly --------------------------------------------
-
 ## summary statistics and simple plot
 y <- d[,ncol(d)]
 summary(y)
@@ -86,7 +83,6 @@ plot(to_check$x0, to_check$x1, col = to_check$colors)
 
 
 # Initial values ----------------------------------------------------------
-
 ## set initial values as strict line:
 pars1 <- seq(1, 1/(Time+1), len = Time+1)
 pars1
@@ -99,8 +95,7 @@ pars2
 
 
 # Estimation --------------------------------------------------------------
-
-## compare two estimates with different initial values:
+## compare two estimates with different initial values using num gradient:
 est_gr1_pars1 <- estimate_w(loglkl_mvn_penalty, calc_gradient_num, pars1, d, 100000)
 est_gr1_pars1
 
@@ -111,24 +106,79 @@ est_gr1_w <- estimate_w(loglkl_mvn_penalty, calc_gradient_num, w, d, 100000)
 est_gr1_w #initial values as true parameters
 
 
-## compare two estimates with different gradient and pars:
+## compare two estimates with different initial values and true gradient:
 est_gr2_pars1 <- estimate_w(loglkl_mvn_penalty, gradient_loglkl_penalty, pars1,
                                       d, 100000)
 est_gr2_pars1
 
-est4_gr2_pars2 <- estimate_w(loglkl_mvn_penalty, gradient_loglkl_penalty, pars2,
+est_gr2_pars2 <- estimate_w(loglkl_mvn_penalty, gradient_loglkl_penalty, pars2,
                    d, 100000)
-est_gr1_pars2
-# initial values as true parameters
-est4_gr2_w <- estimate_w(loglkl_mvn_penalty, gradient_loglkl_penalty, w,
+est_gr2_pars2
+
+est_gr2_w <- estimate_w(loglkl_mvn_penalty, gradient_loglkl_penalty, w,
                              d, 100000)
-est_gr1_w
+est_gr2_w # initial values as true parameters
+
+
+
+
+# Divide and Conquer ------------------------------------------------------
+## get the third pair of initial parameters:
+pars3 <- generate_pars_by_range(t = Time, d = d, opt_f = loglkl_mvn_penalty, 
+            grad = gradient_loglkl_penalty, maxit = 10000)
+pars3
+
+est_gr1_pars3 <- estimate_w(loglkl_mvn_penalty, calc_gradient_num, pars3, d, 100000)
+est_gr1_pars3
+
+est_gr2_pars3 <- estimate_w(loglkl_mvn_penalty, gradient_loglkl_penalty, pars3,
+                            d, 100000)
+est_gr2_pars3
+
+
+
+
+# Tempering Method --------------------------------------------------------
+## square the likelihood and take the log, then optimize
+est2_gr2_pars1 <- estimate_w(tempering_loglkl_mvn_penalty, 
+                             tempering_gradient_loglkl_penalty, 
+                             pars1, d, 100000)
+est2_gr2_pars1
+
+est2_gr2_pars2 <- estimate_w(tempering_loglkl_mvn_penalty, 
+                             tempering_gradient_loglkl_penalty, 
+                             pars2, d, 100000)
+est2_gr2_pars2
+
+est2_gr2_pars3 <- estimate_w(tempering_loglkl_mvn_penalty, 
+                                   tempering_gradient_loglkl_penalty, 
+                                   pars3, d, 100000)
+est2_gr2_pars3 #they are going crazy
+
+est2_gr2_w <- estimate_w(tempering_loglkl_mvn_penalty, 
+                               tempering_gradient_loglkl_penalty, 
+                               w, d, 100000)
+est2_gr2_w
+
+
+
+
+# Dynamic Linear Models ---------------------------------------------------
+est3_gr1_pars1 <- estimate_w(dynamic_loglkl_mvn_penalty, 
+                             calc_gradient_num, 
+                             pars1, d, 100000)
+est3_gr1_pars1
+
+
+
+
+# Parallel programming ----------------------------------------------------
+#llply(d, estimate_w, opt_f = loglkl_mvn_penalty, grad = calc_gradient_num, pars = pars3, maxit = 100000, .parallel = 1)
 
 
 
 
 # Assessment --------------------------------------------------------------
-
 mse(est2$par, w)
 mse(est4$par, w) 
 
@@ -142,17 +192,16 @@ plot_residuals(est1$par, est2$par)
 
 
 # MoM (alternative) -------------------------------------------------------
-
 mom_est <- gmm(g = loglkl_mvn_penalty, x = d, t0 = w, 
                gradv = gradient_loglkl_penalty, optfct = "optim", 
                itermax = 1000000)
 
+## did not work as expected
 
 
 
 
 # Plots -------------------------------------------------------------------
-
 ## NEW: later
 ## Concern: there is small discrepancy in estimates, so optim() might be 
 ## converging to local maxima. To find out, we get 3D plot:
@@ -167,7 +216,6 @@ lkl_plot_col(d)
 
 
 # Gradients ---------------------------------------------------------------
-
 gr1 <- calc_gradient_num(loglkl_mvn_penalty, w, d, epsilon=10^-6)
 gr1
 
@@ -175,38 +223,7 @@ gr2 <- gradient_loglkl_penalty(w, d)
 gr2
 
 # little bit discrepancy: is it due the new gradient? which one is causing
-# the discrepancy?
-
-
-
-
-
-# New estimation method ---------------------------------------------------
-
-# We will divide parameters into ranges:
-# range1: {w_0, ..., w_4}
-est5_gr2_part1 <- estimate_w(loglkl_mvn_penalty, calc_gradient_num, pars2[1:8],
-                             d[,-(9:16)], 100000)
-est5_gr2_part1
-
-est5_gr2_part2 <- estimate_w(loglkl_mvn_penalty, calc_gradient_num, w[9:16],
-                             d[,-(1:8)], 100000)
-est5_gr2_part2
-
-pars3 <- c(est5_gr2_part1$par, est5_gr2_part2$par)
-est_gr2_pars3 <- estimate_w(loglkl_mvn_penalty, gradient_loglkl_penalty, pars3,
-                            d, 100000)
-est_gr2_pars3
-
-#does not working??
-
-
-
-# write a new code here -- automated?
-
-
-
-
+# the discrepancy? >> should check it later
 
 
 
