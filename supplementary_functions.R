@@ -251,7 +251,7 @@ estimate_w <- function(opt_f, grad, pars, d, maxit){
 #   opt_f: likelihood function to be optimized
 #   grad:  gradient of opt_f
 #   pars:  initial values for w
-#   d:     observed data
+#   d:     data frame, last column is response Y, others are input X's
 #   maxit: maximum number of iterations
 #
 # Output: 
@@ -280,7 +280,7 @@ generate_pars_by_range <- function(t, d, opt_f, grad, maxit) {
 #
 # Args:
 #   t:     Time(T) or length(X)-1
-#   d:     observed data
+#   d:     data frame, last column is response Y, others are input X's
 #   opt_f: likelihood function to be optimized
 #   grad:  gradient of opt_f
 #   maxit: maximum number of iterations            
@@ -315,8 +315,17 @@ generate_pars_by_range <- function(t, d, opt_f, grad, maxit) {
 
 
 
-tempering_loglkl_mvn_penalty <- function(w,d) { # 
-    
+tempering_loglkl_mvn_penalty <- function(w,d) {
+# Calculates the log-likelihood function with penalty. One can use both methods
+# of gradient: true one and the one calculated numerically
+#
+# Args:
+#   w:      weights, in a vector form    
+#   d:      data frame, last column is response Y, others are input X's
+# 
+# Output:
+#   result: numeric log-likelihood
+ 
     time <- ncol(d)-2
     # calculate the covariance matrix for yw
     omega <- gcalc_corr(d,w)
@@ -418,6 +427,38 @@ tempering_method <- function(k, opt_f, grad, pars, d, maxit) {
     return(opt)
 }
 
+
+
+
+dynamic_log_lkl_mvn_penalty <- function(w, d) {
+# Calculates the gradient of f: log-likelihood with penalty w.r.t w
+# One should use calc_gradient_numerically for optim()
+#
+# Args: 
+#   w: weights, in a vector form
+#   d: data frame, last column is response Y, others are input X's
+#
+# Output:
+#   gr: gradients, in a vector form
+
+    time <- ncol(d)-2
+    # calculate the covariance matrix for yw
+    omega <- gcalc_corr(d,w)
+    
+    # calculate the convariance matrix for w
+    sigma <- 1/(0.36)*calc_Sigma(time+1, 0.99)
+    
+    # data model: log_likelihood 
+    p_yw <- dmvnorm(d[,ncol(d)], mean = rep(0, nrow(d)), sigma = omega, log = TRUE)  
+    
+    # prior on w: quarterly periodic, 6 pairs of harmonics
+    p_w <- dlmModTrig(s = 4, q = 6)
+    
+    # the posterior which will be maximized
+    result <- p_yw + p_w
+
+    result()
+}
 
 
 
