@@ -430,6 +430,24 @@ tempering_method <- function(k, opt_f, grad, pars, d, maxit) {
 
 
 
+
+simulate_w_dlm <- function () {
+#
+#
+#
+#
+#
+#
+
+
+
+    return (w)
+}
+
+
+
+
+## to be a lot modified!!!!!!!
 dynamic_loglkl_mvn_penalty <- function(w, d) {
 # Calculates the gradient of f: log-likelihood with penalty w.r.t w
 # One should use calc_gradient_numerically for optim()
@@ -459,6 +477,9 @@ dynamic_loglkl_mvn_penalty <- function(w, d) {
 
     result()
 }
+
+
+
 
 
 
