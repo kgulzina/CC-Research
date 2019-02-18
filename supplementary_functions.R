@@ -273,8 +273,7 @@ estimate_w <- function(opt_f, grad, pars, d, maxit){
 
 
 
-generate_pars_by_range <- function(t, d, opt_f = loglkl_mvn_penalty, 
-    grad = gradient_loglkl_penalty, maxit = 10000) {
+generate_pars_by_range <- function(t, d, opt_f, grad, maxit) {
 # This function will generate initial values. Another papir of initial values # are sampled from AR(1), divided into quiantiles of 30 percents. New initial 
 # values are estimated using MLE method, and the new values are the target
 # initial values.
@@ -293,7 +292,7 @@ generate_pars_by_range <- function(t, d, opt_f = loglkl_mvn_penalty,
     pars <- simulate_log_w(t)
 
     # get legth of the range
-    ranges <- (t+1) %/% 3
+    range <- (t+1) %/% 3
 
     # declare target initial values
     result <- c()
@@ -302,16 +301,132 @@ generate_pars_by_range <- function(t, d, opt_f = loglkl_mvn_penalty,
     for (i in 1:3) {
         if (i == 3) {
             result[k:(t+1)] = estimate_w(opt_f, grad, pars[k:(t+1)], 
-            d[,c(k:(t+1), t+2], maxit)
+            d[,c(k:(t+1), t+2)], maxit)$par
         } else {
             result[k:(i*range)] = estimate_w(opt_f, grad, pars[k:(i*range)], 
-            d[,c(k:(i*range), t+2], maxit)
+            d[,c(k:(i*range), t+2)], maxit)$par
         } 
         k <- k + range 
     }
 
     return(result)
 }
+
+
+
+
+tempering_loglkl_mvn_penalty <- function(w,d) { # 
+    
+    time <- ncol(d)-2
+    # calculate the covariance matrix for yw
+    omega <- gcalc_corr(d,w)
+    
+    # calculate the convariance matrix for w
+    sigma <- 1/(0.36)*calc_Sigma(time+1, 0.99)
+    
+    # data model: log_likelihood 
+    p_yw <- dmvnorm(d[,ncol(d)], mean = rep(0, nrow(d)), sigma = omega, log = TRUE)  
+    
+    # prior on w: log_likelihood
+    p_w <- dmvnorm(w, mean = rep(0, time+1), sigma = sigma , log = TRUE)
+    
+    # the posterior which will be maximized
+    result <- p_yw + p_w 
+    
+    return(k*result)
+}
+
+
+
+
+tempering_gradient_loglkl_penalty <- function(w, d){
+    # Calculates the gradient of f: log-likelihood with penalty w.r.t w
+    #
+    # Args: 
+    #   w: weights, in a vector form
+    #   d: data frame, last column is response Y, others are input X's
+    #
+    # Output:
+    #   gr: gradients, in a vector form
+    
+    n <- length(w)
+    gr <- numeric(n)
+    
+    # omega
+    omega <- calc_corr_sampled(d[,-(n+1)], n-1, nrow(d), w)
+    
+    # inverse of omega
+    inv_omega <- solve(omega)
+    
+    # inverse of pi
+    inv_pi <- solve(1/(0.36)*calc_Sigma(n, 0.99))
+    
+    for(i in 1:n) {
+        dm <- calc_mtrx_deriv(d[,-ncol(d)], n-1, nrow(d), w, i)
+        # for penalty term: way 1
+        #dpenalty <- 0
+        #for (j in 1:n){
+        #    temp = -1/2*w[j]*(inv_pi[i,j] + inv_pi[j,i])
+        #    dpenalty <- dpenalty + temp
+        #}
+        
+        # for penalty term: way 2
+        if (!(i == 1 | i == n)) {
+            dpenalty <- -1/2*(w[i-1]*(inv_pi[i-1,i] + inv_pi[i,i-1]) +
+                                  2*w[i]*inv_pi[i,i] +
+                                  w[i+1]*(inv_pi[i+1,i] + inv_pi[i,i+1]))
+        }
+        
+        else {
+            dpenalty <- -w[i]*inv_pi[i,i]
+        }
+        
+        # final gradient
+        gr[i] <- -1/2*sum(diag(inv_omega%*%dm)) + 
+            1/2*t(d[,n+1])%*%inv_omega%*%dm%*%inv_omega%*%d[,n+1] +
+            -1/2*dpenalty
+    }
+    
+    return(k*gr)
+    
+}
+
+
+
+
+## did not work
+tempering_method <- function(k, opt_f, grad, pars, d, maxit) {
+# Takes the power of lkl_function, then log. After it calculates the gradient  # and finds estimates according to the new log_likelihood function.
+#
+# Args:
+#   k:     power of log_likelihood
+#   d:     observed data
+#   opt_f: likelihood function to be optimized
+#   grad:  gradient of opt_f
+#   maxit: maximum number of iterations
+#
+# Output:  output of optim()
+
+    opt <- optim(par = pars, k*opt_f, d = d, control = list(fnscale = -1,
+                                                          maxit=maxit),
+                 k*grad)
+
+    # print true values of w
+    print("True values of w")
+    print(w)
+
+    return(opt)
+}
+
+
+
+
+
+
+
+
+
+
 
 
 
