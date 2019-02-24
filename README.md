@@ -24,9 +24,8 @@ My research goal is to build an emulator (i.e., surrogate) for the Water Erosion
 
 - Collect the simulated data from STRIPS-1
 - Sensitivity analysis using paper of Prof. Morris
-- Try Tempering method suggested by Prof. Niemi
-- Decide on the optimal sample size
 - Try Prof. Morris's approach: use basis functions, dlm R-package, "Dynamic Linear Models with R" on Time Series. Choose optimal q = number of harmonics, where harmonics come in pairs. So you will have 2q number of parameters to estimate instead of 365. Book pages: {102, 103, 108} 
+- Trying to run code on smaster
 
 
 
@@ -49,6 +48,9 @@ My research goal is to build an emulator (i.e., surrogate) for the Water Erosion
 - Tried new pars: simulated from AR(1)
 - Found MoM estimators of weights: techniques, don't work well as I wanted
 - Found a new distribution which takes into account facts about weights: 1. High correlation 2.Concentration around zero 3.Positiveness :Beta autoregressive process -- did not work since it is spiky
+- Tried Tempering method suggested by Prof. Niemi
+- Decide on the optimal sample size: 100 < n < 200 for w(t) ~ AR(1)
+
 
 
 
