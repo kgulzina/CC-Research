@@ -157,6 +157,44 @@ simulate_d <- function(t, n, w){
 
 
 
+simulate_trunc_d <- function(t, n, w){
+# Simulates data: both X and Y according to GP model described in 
+# "CC-Process" log-file
+# 
+# Args:
+#   t: Time(T) or length(X)-1
+#   n: sample size
+#   w: weights, in a vector form
+#
+# Outputs:
+# d: data frame, last column is response Y, others are input X's 
+    
+    sigma <- calc_Sigma(t+1, rho = 0.95)
+    
+    # simulate X's (leaving X's as it is)
+    x_values <- mvrnorm(n, rep(0, t+1), sigma)
+    
+    #calculate omega for Y
+    omega <- calc_corr_sampled(x_values, t, n, w)
+    
+    # simulate Y's
+    theta <- rmvnorm(1, mean = rep(0, n), sigma = omega)
+
+    # add minumum positive theta to all theta
+    theta <- theta + min(theta[theta > 0])
+
+    # exponentiate theta's
+    y <- exp(theta)
+    
+    # combine datasets: functional input and scale output
+    d <- cbind(x_values,t(y))
+    
+    return(d)
+}
+
+
+
+
 simulate_w_mvn <- function(t){
 # Simulates weights from MVN ~ (GP), according to assumption in 
 # CC-Process - 1c
@@ -176,7 +214,7 @@ simulate_w_mvn <- function(t){
 
 
 
-simulate_w_trnctd <- function(t){
+simulate_trunc_w <- function(t){
 # Simulates weights from truncated (positive) MVN ~ (GP), according to 
 # the assumptions in CC-Process - 1c
 #    
@@ -404,7 +442,7 @@ tempering_gradient_loglkl_penalty <- function(w, d){
 
 
 ## did not work
-tempering_method <- function(k, opt_f, grad, pars, d, maxit) {
+estimate_by_tempering_method <- function(k, opt_f, grad, pars, d, maxit) {
 # Takes the power of lkl_function, then log. After it calculates the gradient  # and finds estimates according to the new log_likelihood function.
 #
 # Args:
@@ -431,6 +469,7 @@ tempering_method <- function(k, opt_f, grad, pars, d, maxit) {
 
 
 
+## have to modify these two, can later add gradient
 simulate_w_dlm <- function () {
 #
 #
@@ -438,9 +477,10 @@ simulate_w_dlm <- function () {
 #
 #
 #
-
-
-
+    mod1 <- dlmModTrig(s = 364, q = 6) + dlmModPoly(order = 1)
+    
+    smoothW <- dlmSmooth(w, mod1)
+    
     return (w)
 }
 

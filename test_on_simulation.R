@@ -21,7 +21,7 @@ library(dlm)
 # Conventions -------------------------------------------------------------
 ## sample size and Time: T << n
 n <- 100 # for more sample size I am getting more stable estimates!
-Time <- 15
+Time <- 364
 rho <- 0.99
 sigmasq <- 1
 
@@ -46,6 +46,9 @@ w <- simulate_log_w(Time) #current
 
 ## simulate data:
 d <- simulate_d(Time, n, w)
+
+## simulate truncated data:
+d <- simulate_trunc_d(Time, n, w)
 
 
 
