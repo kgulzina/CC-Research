@@ -477,7 +477,7 @@ simulate_w_dlm <- function () {
 #
 #
 #
-    mod1 <- dlmModTrig(s = 364, q = 6) + dlmModPoly(order = 1)
+    mod1 <- dlmModTrig(s = 364, q = 6)
     
     smoothW <- dlmSmooth(w, mod1)
     
