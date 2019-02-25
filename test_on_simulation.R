@@ -20,8 +20,8 @@ library(dlm)
 
 # Conventions -------------------------------------------------------------
 ## sample size and Time: T << n
-n <- 100 # for more sample size I am getting more stable estimates!
-Time <- 364
+n <- 12 # for more sample size I am getting more stable estimates!
+Time <- 10
 rho <- 0.99
 sigmasq <- 1
 
@@ -50,6 +50,8 @@ d <- simulate_d(Time, n, w)
 ## simulate truncated data:
 d <- simulate_trunc_d(Time, n, w)
 
+## real wepp data
+d <- wepp_data[,c(1:11, ncol(wepp_data))]
 
 
 
@@ -69,6 +71,7 @@ plot(min1_y)
 # convert to colors:
 colors <- colorRampPalette(c("red", "orange", "blue"))(3)[min1_y]
  
+
 # check if all Y's have been assigned colors: n is good
 length(colors)
 
