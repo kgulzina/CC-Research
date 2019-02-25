@@ -7,10 +7,11 @@
 # STRIPS-1 Configurations -------------------------------------------------
 library("devtools")
 install_github("ISU-STRIPS/STRIPS")
-STRIPSMeta::watersheds
+STRIPSMeta::watersheds -> watersheds
 
-# comments: meta data is not informative at all
-
+# comments: have information on the name and slope of watershed
+watersheds %>%  mode() #list
+watersheds
 
 
 
@@ -43,10 +44,10 @@ soil_loss$mo %>% table() #not consistent
 ## how to generate more climate data? Bootstarpping???
 
 # read the climate data set
-climate <- read.table("data/092.63x040.90.cli", 
+climate <- read.table("data/092.63x040.90.cli.txt", 
                       skip = 14, 
                       header = TRUE,
-                      sep = " ")
+                      sep = "\t")
 ## data is damaged??? 
 
 
@@ -57,7 +58,7 @@ climate <- read.table("data/092.63x040.90.cli",
 # It has the same parameters as the real climate file: the same station,
 # the same coordinates. Year is not given, since it is not real.
 
-climate_wepp <- read.table("data/p0.cli.txt",
+climate_wepp <- read.table("data/092.63x040.90.cli.txt",
                            skip = 15,
                            header = FALSE)
 colnames(climate_wepp) <- c("day",  "month", "year", "prcp", "dur",
