@@ -6,6 +6,7 @@
 
 # STRIPS-1 Configurations -------------------------------------------------
 library("devtools")
+library(dplyr)
 install_github("ISU-STRIPS/STRIPS")
 STRIPSMeta::watersheds -> watersheds
 
@@ -94,13 +95,13 @@ dim(soil_loss_wepp)
 
 # Collect data into one - Real --------------------------------------------
 # convert Runoff to numeric
-soil_loss$Runoff <- as.numeric(as.character(soil_loss$Runoff))
+soil_loss_wepp$IR.det <- as.numeric(as.character(soil_loss_wepp$IR.det))
 
-soil_loss %>% select(year, Runoff) %>% group_by(year) %>% 
-    summarise(mean_soil_loss = mean(Runoff)) %>% unlist() %>% 
+soil_loss_wepp %>% select(year, IR.det) %>% group_by(year) %>% 
+    summarise(mean_soil_loss = sum(IR.det)) %>% unlist() %>% 
     matrix(ncol = 2, byrow = FALSE) %>% data.frame() -> sl_wepp
 
-colnames(sl_wepp) <- c("year", "runoff")
+colnames(sl_wepp) <- c("year", "soil_loss")
 
 # get precipitation
 get_prcp <- function(df) {
