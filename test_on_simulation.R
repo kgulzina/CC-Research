@@ -22,6 +22,7 @@ library(dlm)
 ## sample size and Time: T << n
 n <- 12 # for more sample size I am getting more stable estimates!
 Time <- 10
+q <- 1 #number of harmonics
 rho <- 0.99
 sigmasq <- 1
 
@@ -42,13 +43,19 @@ source("3D_plot_loglkl.R")
 #w1 <- simulate_log_w_stan(Time)
 
 ## Approach 2 to simulate w:
-w <- simulate_log_w(Time) #current
+#w <- simulate_log_w(Time)
+
+# Simulate coefficients for approach 3
+theta <- simulate_coeff_dlm(q)
+
+## Approach 3 to simulate w:
+w <- simulate_w_dlm(theta, Time+1) #current
 
 ## simulate data:
 d <- simulate_d(Time, n, w)
 
 ## simulate truncated data:
-d <- simulate_trunc_d(Time, n, w)
+#d <- simulate_trunc_d(Time, n, w) 
 
 ## real wepp data
 d <- wepp_data[,c(1:11, ncol(wepp_data))]
@@ -97,6 +104,20 @@ pars1
 pars2 <- simulate_log_w(Time)
 pars2
 
+## set initial values foe coefficients
+pars_coef <- rep(0, Time+1)
+
+
+
+
+# Dynamic Linear Models ---------------------------------------------------
+est3_gr1_pars1 <- optim(par = pars_coef, 
+                        dynamic_loglkl_mvn_penalty, 
+                        d = d, 
+                        control = list(fnscale = -1,
+                        maxit = 1000000))
+est3_gr1_pars1
+theta
 
 
 
@@ -166,14 +187,6 @@ est2_gr2_w <- estimate_w(tempering_loglkl_mvn_penalty,
                                w, d, 100000)
 est2_gr2_w
 
-
-
-
-# Dynamic Linear Models ---------------------------------------------------
-est3_gr1_pars1 <- estimate_w(dynamic_loglkl_mvn_penalty, 
-                             calc_gradient_num, 
-                             pars1, d, 100000)
-est3_gr1_pars1
 
 
 
