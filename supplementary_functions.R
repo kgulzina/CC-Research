@@ -300,8 +300,8 @@ estimate_w <- function(opt_f, grad, pars, d, maxit){
                  gr = grad) 
     
     # print true values of w
-    print("True values of w")
-    print(w)
+    print("True values of theta")
+    print(theta)
     
     # estimated w
     return(opt)
@@ -470,16 +470,27 @@ estimate_by_tempering_method <- function(k, opt_f, grad, pars, d, maxit) {
 
 
 ## have to modify these two, can later add gradient
-simulate_w_dlm <- function () {
+simulate_w_dlm <- function (theta, s) {
+# Simulates weights as a linear combinations of q Fourier s-dimensional
+# vectors (trignometric ~ periodic basis vectors of R^s).
+# Args:
+#   theta:  coefficients of harmonics, in a vector form
+#   s:      dimension of weight, Time(T) + 1 or Length(X)
 #
-#
-#
-#
-#
-#
-    mod1 <- dlmModTrig(s = 364, q = 6)
+# Output:
+#   w:      weights, in a vector forn
     
-    smoothW <- dlmSmooth(w, mod1)
+    # get q
+    q <- (length(theta) - 1)/2
+    
+    # generate basis
+    basis <- generate_trig_basis(s, q)
+    
+    # generate logit_w
+    logit_w <- theta%*%basis
+    
+    # get w
+    w <- exp(logit_w)/(1+exp(logit_w))
     
     return (w)
 }
@@ -487,8 +498,74 @@ simulate_w_dlm <- function () {
 
 
 
-## to be a lot modified!!!!!!!
-dynamic_loglkl_mvn_penalty <- function(w, d) {
+simulate_coeff_dlm <- function(q) {
+# Simulates coefficients for the trigonometric basis of R^s. Uses the
+# structure and nature of weights, giving more significance to leading
+# harmonics after e_0. For simplicity, we'll use uniform dist for now.
+#
+# Args:
+#   q:      number of harmonics
+#
+# Output:
+#   coeffs: coefficients of harmonics, in a vector form
+    
+    coeffs <- runif(2*q+1, min = -1, max = 1)
+    
+    return(coeffs)
+} 
+
+
+
+generate_freq_w <- function(s, j) {
+# Generates Fourier frequencies to be used in basis vectors.
+#
+# Args:
+#   s:      dimension of weight, Time(T) + 1 or Length(X)
+#   j:      frequency time
+#
+# Output:
+#   w_j:    frequency at time j
+    
+    w_j <- 2*pi*j/s
+    
+    return(w_j)
+}
+
+
+
+
+generate_trig_basis <- function(s, q) {
+# Generates trigonometric basis -- harmonics. 
+#
+# Args:
+#   s:      dimension of weight, Time(T) + 1 or Length(X)
+#   q:      number of harmonics
+#
+# Output:
+#   basis:  harmonics, in a matrix format
+    
+    # vector of sequence 1:s
+    v <- 1:s
+    
+    # basis with first constant row
+    basis <- (rep(1, times = s))
+    
+    # fill the rest harmonics
+    for (j in 1:q) {
+        # generate frequencies
+        temp <- generate_freq_w(s, j) * v
+        basis <- rbind(basis,
+                       cos(temp),
+                       sin(temp))
+    }
+    
+    return(basis)
+}
+
+
+
+
+dynamic_loglkl_mvn_penalty <- function(theta, d) {
 # Calculates the gradient of f: log-likelihood with penalty w.r.t w
 # One should use calc_gradient_numerically for optim()
 #
@@ -499,7 +576,17 @@ dynamic_loglkl_mvn_penalty <- function(w, d) {
 # Output:
 #   gr: gradients, in a vector form
 
+    # some constants
     time <- ncol(d)-2
+    q <- (length(theta) - 1) / 2
+    
+    # penalty on w
+    basis <- generate_trig_basis(time+1, q)
+    logit_w <- theta%*%basis
+    
+    # get w
+    w <- exp(logit_w)/(1+exp(logit_w))
+    
     # calculate the covariance matrix for yw
     omega <- gcalc_corr(d,w)
     
@@ -509,13 +596,10 @@ dynamic_loglkl_mvn_penalty <- function(w, d) {
     # data model: log_likelihood 
     p_yw <- dmvnorm(d[,ncol(d)], mean = rep(0, nrow(d)), sigma = omega, log = TRUE)  
     
-    # prior on w: quarterly periodic, 6 pairs of harmonics
-    p_w <- dlmModTrig(s = 4, q = 2)
-    
     # the posterior which will be maximized
-    result <- p_yw + p_w
+    result <- p_yw
 
-    result()
+    return(result)
 }
 
 
