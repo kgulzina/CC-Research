@@ -31,6 +31,7 @@ source('supplementary_functions.R')
 source('loglkl_with_penalty.R')
 source("assess_accuracy.R")
 source("3D_plot_loglkl.R")
+source("wepp_data.R")
 
 
 

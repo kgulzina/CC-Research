@@ -7,8 +7,6 @@ library(tmvtnorm)
 
 
 
-
-
 # cov. matrix for MVN simulation: n samples
 #sigma <- calc_Sigma(Time+1, rho = 0.95)
 
