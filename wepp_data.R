@@ -368,7 +368,12 @@ soil_loss_env %>%
 
 # rename columns
 colnames(soil_loss) <- c("year", "field", "hill", "soil_loss")
+
+# convert soil_loss to numeric
+soil_loss %>% 
+    mutate(soil_loss = as.numeric(as.character(soil_loss))) -> soil_loss
 soil_loss %>% head()
+soil_loss %>% glimpse()
 
 ### comments: before we get daily precipitation: we have to take into 
 # consideration three leap years: 2008, 2012, 2016 which have one additional 
@@ -406,11 +411,17 @@ prcp %>% head()
 # the same >> same parameters
 
 # we have to merge the datasets by years:
-wepp_data <- merge(soil_loss, prcp, by = "year")
+wepp_data <- merge(prcp, soil_loss, by = "year")
 wepp_data %>% glimpse()
 wepp_data %>% dim()
 
 ### comments: I think, I got finally, what I wanted!!!
+
+
+
+
+# Save final data in .csv file --------------------------------------------
+write.csv(wepp_data, file = "wepp_data.csv", row.names = FALSE)
 
 
 
