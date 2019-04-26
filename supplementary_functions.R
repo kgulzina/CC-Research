@@ -566,15 +566,13 @@ generate_trig_basis <- function(s, q) {
 
 
 dynamic_loglkl_mvn_penalty <- function(theta, d) {
-# Calculates the gradient of f: log-likelihood with penalty w.r.t w
-# One should use calc_gradient_numerically for optim()
 #
-# Args: 
-#   w: weights, in a vector form
-#   d: data frame, last column is response Y, others are input X's
+# Args:
+#   theta:
+#   d:
 #
 # Output:
-#   gr: gradients, in a vector form
+#   result:
 
     # some constants
     time <- ncol(d)-2
@@ -590,11 +588,8 @@ dynamic_loglkl_mvn_penalty <- function(theta, d) {
     # calculate the covariance matrix for yw
     omega <- gcalc_corr(d,w)
     
-    # calculate the convariance matrix for w
-    sigma <- 1/(0.36)*calc_Sigma(time+1, 0.99)
-    
     # data model: log_likelihood 
-    p_yw <- dmvnorm(d[,ncol(d)], mean = rep(0, nrow(d)), sigma = omega, log = TRUE)  
+    p_yw <- dmvnorm(d[,ncol(d)], mean = rep(0, nrow(d)), sigma = omega)  
     
     # the posterior which will be maximized
     result <- p_yw
