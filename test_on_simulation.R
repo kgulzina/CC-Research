@@ -106,7 +106,7 @@ pars2 <- simulate_log_w(Time)
 pars2
 
 ## set initial values foe coefficients
-pars_coef <- rep(0, Time+1)
+pars_coef <- rep(0, 2*q+1)
 
 
 
