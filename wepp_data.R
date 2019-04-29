@@ -4,9 +4,19 @@
 
 
 
-# STRIPS-1 Configurations -------------------------------------------------
-library("devtools")
+
+
+# Sourcing and libraries --------------------------------------------------
+source("supplementary_functions.R")
+library(devtools)
 library(dplyr)
+library(stringr)
+
+
+
+
+
+# STRIPS-1 Configurations -------------------------------------------------
 install_github("ISU-STRIPS/STRIPS")
 STRIPSMeta::watersheds -> watersheds
 
@@ -20,7 +30,6 @@ watersheds
 # WEPP watershed visualization --------------------------------------------
 # we need to collect data on each watershed/hillslope frame
 # frame is given as a total geometric measurements of each hillslope
-library(stringr)
 get_hillslope_frame <- function() {
 ### write documentation here ###
     # declare names of watersheds
@@ -48,7 +57,7 @@ get_hillslope_frame <- function() {
                 45.5810, 54.0000, 101.1290, 123.0000, 46.0000, 57.0000)
     
     # declare soil type of each hill
-    soil_id <- c("LADOGA(SIL)", "LADOGA(SIL)", "LAMONI(L)",
+    soil_name <- c("LADOGA(SIL)", "LADOGA(SIL)", "LAMONI(L)",
                  "LADOGA(SIL)", "LADOGA(SIL)", "LAMONI(L)",
                  "LADOGA(SIL)", "LADOGA(SIL)", "LAMONI(L)",
                  "LADOGA(SIL)", "LADOGA(SIL)", "LAMONI(L)",
@@ -60,13 +69,20 @@ get_hillslope_frame <- function() {
                  "OTLEY(SICL)", "LADOGA(SIL)", "GARA(L)",
                  "OTLEY(SICL)", "LADOGA(SIL)", "ACKMORE(SIL)",
                  "OTLEY(SICL)", "OTLEY(SICL)", "LADOGA(SIL)")
+    soil_id <- c("76C2", "76D2", "822D2", "76C2", "76D2", "822D2",
+                 "76C2", "76D2", "822D2", "76C2", "76D2", "822D2",
+                 "76C2", "76D2", "993D2", "76C2", "76D2", "993D2",
+                 "281C2", "222D2", "5B", "281B", "76C2", "222D2",
+                 "5B", "76C2", "93D2", "281C2", "76D2", "179D2",
+                 "281C2", "76D2", "5B", "281B", "281C2", "76D2")
     
     # make a count for length and soil type
     count = 1
     
     # dataset frame
     df <- data.frame(HUC_12 = NA, watershed = NA, hill = NA, width = NA,
-                     length = NA, soil_id = NA, sublength = NA, slope = NA)
+                     length = NA, soil_name = NA, soil_id = NA,
+                     sublength = NA, slope = NA)
     
     for (i in 1:12) {
         # check if interim 2
@@ -95,6 +111,7 @@ get_hillslope_frame <- function() {
                                         hill = hills_long[j],
                                         width = width[i],
                                         length = length[count],
+                                        soil_name = soil_name[count],
                                         soil_id = soil_id[count])
                 # add to the main dataset
                 df <- rbind(df, temp_df)
@@ -128,6 +145,7 @@ get_hillslope_frame <- function() {
                                         hill = hills_long[j],
                                         width = width[i],
                                         length = length[count],
+                                        soil_name = soil_name[count],
                                         soil_id = soil_id[count])
                 # add to the main dataset
                 df <- rbind(df, temp_df)
@@ -160,6 +178,7 @@ get_hillslope_frame <- function() {
                                         hill = hills_long[j],
                                         width = width[i],
                                         length = length[count],
+                                        soil_name = soil_name[count],
                                         soil_id = soil_id[count])
                 # add to the main dataset
                 df <- rbind(df, temp_df)
@@ -180,11 +199,11 @@ hillslope_info %>% head()
 
 
 
+
 # WEPP - climate data - CLIGEN --------------------------------------------
 # This climate file was simulated from CLIGEN - Des Moines IA station for 12
 # years. I choose Des Moines station, since it is the closest one to the 
 # Neal Smith.
-library(dplyr)
 climate <- read.table("data/climate/092.63x040.90.cli.txt",
                       skip = 15,
                       header = FALSE,
@@ -228,25 +247,21 @@ climate$year %>% unique() #12 years -- good
 
 
 # WEPP - soil input -------------------------------------------------------
-library(dplyr)
 ## soil encoding -- no header
 mapunit <- read.table("data/soil/mapunit.txt",
                       sep = "|",
                       header = FALSE)
 mapunit %>% head()
 
-
 ## soil encoding -- no header
 muaggatt <- read.table("data/soil/muaggatt.txt",
                        sep = "|")
 muaggatt %>% head()
 
-
 ## soil encoding -- no header
 muareao <- read.table("data/soil/muareao.txt",
                       sep = "|")
 muareao %>% head()
-
 
 ## we will match soil types with id's given here:
 muaggatt %>% select(V1, V2, V40) -> soil_id 
@@ -255,11 +270,18 @@ muaggatt %>% select(V1, V2, V40) -> soil_id
 soil_names <- c("76C2", "76D2", "822D2", "993D2", "281C2", "222D2", "5B",
                 "281B", "93D2", "179D2")
 soil_types <- soil_id[soil_id$V1 %in% soil_names,]
-colnames(soil_types) <- c("ID", "name", "SSURGO_ID")
+colnames(soil_types) <- c("ID", "name", "MUKEY")
 soil_types
 
 # write it to .csv
 write.csv(soil_types, "soil_types.csv", row.names = FALSE)
+
+### We have more concrete dataset on soil_types from Gabe:
+soil_types_detailed <- read.csv("data/soil/strips_soils_data.txt",
+                                header = TRUE,
+                                sep = "\t")
+soil_types_detailed
+
 
 
 
@@ -267,7 +289,6 @@ write.csv(soil_types, "soil_types.csv", row.names = FALSE)
 
 # WEPP - soil loss  --------------------------------------------------------
 # function to read in
-library(dplyr)
 get_env_results <- function() {
 ### write documentation here ###
     # declare names of watersheds
@@ -428,6 +449,11 @@ prcp %>% head()
 # We will treat 432 examples of soil loss for 12 years and 36 hillslopes as
 # the same >> same parameters
 
+# standardize prcp: by taking log(prcp + smallest non-zero prcp)
+for (i in 1:12) {
+    prcp[i,-366] <- log(prcp[i,-366] + min(prcp[i,prcp[i,-366] != 0]))
+}
+
 # we have to merge the datasets by years:
 annual_soil_loss <- merge(prcp, soil_loss, by = "year")
 annual_soil_loss %>% glimpse()
@@ -443,7 +469,37 @@ write.csv(annual_soil_loss, file = "annual_soil_loss.csv", row.names = FALSE)
 
 
 # Scalar wepp_data  -------------------------------------------------------
-# It's needed to run the simplest model and see if we ca
+# It's needed to run the simplest model and see if we can get valid
+# results. It contains standardized and averaged inputs: temp, prcp, slope
+# write a function to convert slope into functional input given: n
+gen_slope <- function(n, hillslope_info) {
+    # get unique hillslope lengths
+    lengths <- unique(hillslope_info$length)
+    
+    # frame for data
+    d <- data.frame(t(1:(n+1))
+    for (i in 1:36) {
+        # interval length
+        h = lengths[i] / n
+        
+        # which rows to select
+        rows <- which(hillslope_info$length == lengths[i])
+        
+        # how many original sections hillslope has
+        M = length(rows)
+        
+        d[i,0] = 0 #starts from zero
+        temp = 0
+        for (j in 0:n) {
+            temp = temp + h
+            for (m in 1:M) {
+                if (temp < hillslope_info$sublength[rows[m]]) {
+                    ### continue your thing here!!!
+                }
+            }
+        }
+    }
+}
 
 
 
