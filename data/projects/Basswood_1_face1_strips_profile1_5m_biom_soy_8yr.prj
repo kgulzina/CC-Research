@@ -1,0 +1,54 @@
+#
+# WEPP project written: Wed Jun 13 11:34:31 PM 2018 
+#
+Version = 98.6
+Name = Interim
+Comments {
+
+}
+Units = Metric
+Landuse = 1
+Length = 110.090
+Profile {
+   File = "nsw_slope_profiles\basswood1_face1_unnormalized_5m.slp"
+}
+Climate {
+   File = "C:\WEPP\data\climates\observed\NSNWR.cli"
+}
+Soil {
+   Breaks = 1
+   LADOGA(SIL)     {
+      Distance = 89.362
+      File = "IA\LADOGA(SIL).sol"
+   }
+   LAMONI(L)     {
+      Distance = 20.728
+      File = "IA\LAMONI(L).sol"
+   }
+}
+Management {
+   Breaks = 1
+   soybeancorn - no till {
+      Distance = 84.846
+      File = "agriculture\soybeancorn-no till.rot"
+   }
+   Bluestem Prarie {
+      Distance = 25.244
+      File = "Rangeland\Bluestem Prarie_good.rot"
+   }
+}
+RunOptions {
+   Version = 1
+   SummaryFile = AutoName
+   SoilLossOutputType = 1
+   SoilLossOutputFile = AutoName
+   InitialConditionsScenarioFile = AutoName
+   WaterBalanceFile = AutoName
+   SoilFile = AutoName
+   PlotFile = AutoName
+   GraphFile = AutoName
+   EventFile = AutoName
+   FinalSummaryFile = AutoName
+   SimulationYears = 8
+   SmallEventByPass = 1
+}

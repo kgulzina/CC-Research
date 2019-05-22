@@ -1,0 +1,55 @@
+areasymbol	areaname	mukey	musym	muname	cokey	comppct	slope	slopelenusle	depth_top	depth_bottom	kffact	bulk_density	ph	wthirdbar_r	wfifteenbar_r	awc_r	claytotal_r	sandtotal_r	ksat_r	om_r	ll_r	texdesc
+IA099	Jasper	407623	179D2	Gara loam, 9 to 14 percent slopes, moderately eroded	14556527	85	12	46	0	20	.32	1.530	6.500	30.200	17.600	0.170	25.000	35.400	9.000	2.500	40.000	Loam
+IA099	Jasper	407623	179D2	Gara loam, 9 to 14 percent slopes, moderately eroded	14556527	85	12	46	20	107	.32	1.650	5.500	30.800	20.300	0.170	31.500	35.300	3.000	0.250	35.000	Clay loam
+IA099	Jasper	407623	179D2	Gara loam, 9 to 14 percent slopes, moderately eroded	14556527	85	12	46	107	152	.32	1.700	7.000	30.400	20.600	0.170	31.000	35.400	3.000	0.250	35.000	Clay loam
+IA099	Jasper	407636	222D2	Clarinda silty clay loam, 9 to 14 percent slopes, moderately eroded	14556549	90	12	46	0	15	.37	1.480	6.200	34.000	22.400	0.180	32.500	19.700	3.000	2.700	45.000	Silty clay loam
+IA099	Jasper	407636	222D2	Clarinda silty clay loam, 9 to 14 percent slopes, moderately eroded	14556549	90	12	46	15	102	.32	1.580	5.800	33.700	28.300	0.150	50.000	5.300	0.040	0.750	62.500	Silty clay
+IA099	Jasper	407636	222D2	Clarinda silty clay loam, 9 to 14 percent slopes, moderately eroded	14556549	90	12	46	102	152	.32	1.580	7.000	33.300	27.700	0.150	50.000	5.300	0.040	0.250	62.500	Silty clay
+IA099	Jasper	407650	281B	Otley silty clay loam, 2 to 5 percent slopes	14556621	95	4	61	0	18	.32	1.390	6.000	33.500	21.000	0.210	30.000	2.000	3.000	3.500	47.000	Silty clay loam
+IA099	Jasper	407650	281B	Otley silty clay loam, 2 to 5 percent slopes	14556621	95	4	61	18	43	.32	1.300	5.800	32.900	20.000	0.200	33.000	2.000	3.000	2.500	48.000	Silty clay loam
+IA099	Jasper	407650	281B	Otley silty clay loam, 2 to 5 percent slopes	14556621	95	4	61	43	66	.37	1.340	5.500	33.800	21.500	0.190	37.000	2.000	1.100	1.500	50.000	Silty clay loam
+IA099	Jasper	407650	281B	Otley silty clay loam, 2 to 5 percent slopes	14556621	95	4	61	66	81	.43	1.380	5.500	33.500	21.100	0.190	36.000	2.000	1.100	1.000	48.000	Silty clay loam
+IA099	Jasper	407650	281B	Otley silty clay loam, 2 to 5 percent slopes	14556621	95	4	61	81	102	.43	1.400	5.500	33.500	21.100	0.180	36.000	2.000	1.100	0.750	48.000	Silty clay loam
+IA099	Jasper	407650	281B	Otley silty clay loam, 2 to 5 percent slopes	14556621	95	4	61	102	117	.43	1.400	5.900	33.000	20.200	0.180	35.000	2.000	3.000	0.500	46.000	Silty clay loam
+IA099	Jasper	407650	281B	Otley silty clay loam, 2 to 5 percent slopes	14556621	95	4	61	117	135	.43	1.410	5.900	32.100	18.700	0.180	32.000	2.000	3.000	0.500	43.000	Silty clay loam
+IA099	Jasper	407650	281B	Otley silty clay loam, 2 to 5 percent slopes	14556621	95	4	61	135	155	.43	1.420	5.900	31.900	18.200	0.180	31.000	2.000	3.000	0.500	42.000	Silty clay loam
+IA099	Jasper	407650	281B	Otley silty clay loam, 2 to 5 percent slopes	14556621	95	4	61	155	185	.49	1.330	6.100	29.900	15.200	0.180	28.000	2.000	3.000	0.250	38.000	Silty clay loam
+IA099	Jasper	407650	281B	Otley silty clay loam, 2 to 5 percent slopes	14556621	95	4	61	185	200	.49	1.340	6.100	28.800	13.700	0.170	25.000	2.000	6.000	0.250	35.000	Silt loam
+IA099	Jasper	407651	281C2	Otley silty clay loam, 5 to 9 percent slopes, eroded	14556630	90	7	61	0	20	.32	1.300	5.800	32.900	20.000	0.200	33.000	2.000	3.000	2.500	48.000	Silty clay loam
+IA099	Jasper	407651	281C2	Otley silty clay loam, 5 to 9 percent slopes, eroded	14556630	90	7	61	20	43	.37	1.340	5.500	33.800	21.500	0.190	37.000	2.000	1.100	1.500	50.000	Silty clay loam
+IA099	Jasper	407651	281C2	Otley silty clay loam, 5 to 9 percent slopes, eroded	14556630	90	7	61	43	58	.43	1.380	5.500	33.500	21.100	0.190	36.000	2.000	1.100	1.000	48.000	Silty clay loam
+IA099	Jasper	407651	281C2	Otley silty clay loam, 5 to 9 percent slopes, eroded	14556630	90	7	61	58	79	.43	1.400	5.500	33.500	21.100	0.180	36.000	2.000	1.100	0.750	48.000	Silty clay loam
+IA099	Jasper	407651	281C2	Otley silty clay loam, 5 to 9 percent slopes, eroded	14556630	90	7	61	79	94	.43	1.400	5.900	33.000	20.200	0.180	35.000	2.000	3.000	0.500	46.000	Silty clay loam
+IA099	Jasper	407651	281C2	Otley silty clay loam, 5 to 9 percent slopes, eroded	14556630	90	7	61	94	112	.43	1.410	5.900	32.100	18.700	0.180	32.000	2.000	3.000	0.500	43.000	Silty clay loam
+IA099	Jasper	407651	281C2	Otley silty clay loam, 5 to 9 percent slopes, eroded	14556630	90	7	61	112	132	.43	1.420	5.900	31.900	18.200	0.180	31.000	2.000	3.000	0.500	42.000	Silty clay loam
+IA099	Jasper	407651	281C2	Otley silty clay loam, 5 to 9 percent slopes, eroded	14556630	90	7	61	132	162	.49	1.330	6.100	29.900	15.200	0.180	28.000	2.000	3.000	0.250	38.000	Silty clay loam
+IA099	Jasper	407651	281C2	Otley silty clay loam, 5 to 9 percent slopes, eroded	14556630	90	7	61	162	200	.49	1.340	6.100	28.800	13.700	0.170	25.000	2.000	6.000	0.250	35.000	Silt loam
+IA099	Jasper	407671	5B	Ackmore-Colo complex, 2 to 5 percent slopes	14556467	50	4	76	0	20	.43	1.280	6.500	28.900	13.800	0.220	22.500	9.500	9.000	2.000	37.500	Silt loam
+IA099	Jasper	407671	5B	Ackmore-Colo complex, 2 to 5 percent slopes	14556467	50	4	76	20	64	.49	1.280	6.500	28.900	13.800	0.220	22.500	9.500	9.000	2.000	37.500	Silt loam
+IA099	Jasper	407671	5B	Ackmore-Colo complex, 2 to 5 percent slopes	14556467	50	4	76	64	152	.32	1.350	6.700	34.000	22.000	0.190	32.000	6.700	3.000	4.000	47.500	Silty clay loam
+IA099	Jasper	407690	76C2	Ladoga silt loam, 5 to 9 percent slopes, eroded	14556656	85	7	61	0	15	.37	1.330	6.600	30.600	16.300	0.200	25.000	2.000	9.000	2.500	40.000	Silt loam
+IA099	Jasper	407690	76C2	Ladoga silt loam, 5 to 9 percent slopes, eroded	14556656	85	7	61	15	25	.49	1.360	6.000	30.700	16.400	0.190	28.000	2.000	3.000	1.000	40.000	Silty clay loam
+IA099	Jasper	407690	76C2	Ladoga silt loam, 5 to 9 percent slopes, eroded	14556656	85	7	61	25	48	.43	1.420	5.700	32.700	19.700	0.180	33.000	2.000	3.000	0.750	44.000	Silty clay loam
+IA099	Jasper	407690	76C2	Ladoga silt loam, 5 to 9 percent slopes, eroded	14556656	85	7	61	48	64	.37	1.420	5.500	34.300	22.500	0.180	38.000	2.000	1.100	0.750	50.000	Silty clay loam
+IA099	Jasper	407690	76C2	Ladoga silt loam, 5 to 9 percent slopes, eroded	14556656	85	7	61	64	81	.43	1.420	5.500	33.700	21.400	0.180	36.000	2.000	1.100	0.750	48.000	Silty clay loam
+IA099	Jasper	407690	76C2	Ladoga silt loam, 5 to 9 percent slopes, eroded	14556656	85	7	61	81	114	.43	1.420	5.800	33.100	20.200	0.180	34.000	2.000	3.000	0.750	45.000	Silty clay loam
+IA099	Jasper	407690	76C2	Ladoga silt loam, 5 to 9 percent slopes, eroded	14556656	85	7	61	114	130	.49	1.460	6.000	31.800	18.200	0.180	30.000	2.000	3.000	0.500	41.000	Silty clay loam
+IA099	Jasper	407690	76C2	Ladoga silt loam, 5 to 9 percent slopes, eroded	14556656	85	7	61	130	152	.49	1.360	6.100	29.400	14.400	0.170	26.000	2.000	9.000	0.250	36.000	Silt loam
+IA099	Jasper	407691	76D2	Ladoga silt loam, 9 to 14 percent slopes, eroded	14556659	90	12	46	0	15	.37	1.330	6.600	30.600	16.300	0.200	25.000	2.000	9.000	2.500	40.000	Silt loam
+IA099	Jasper	407691	76D2	Ladoga silt loam, 9 to 14 percent slopes, eroded	14556659	90	12	46	15	25	.49	1.360	6.000	30.700	16.400	0.190	28.000	2.000	3.000	1.000	40.000	Silty clay loam
+IA099	Jasper	407691	76D2	Ladoga silt loam, 9 to 14 percent slopes, eroded	14556659	90	12	46	25	48	.43	1.420	5.700	32.700	19.700	0.180	33.000	2.000	3.000	0.750	44.000	Silty clay loam
+IA099	Jasper	407691	76D2	Ladoga silt loam, 9 to 14 percent slopes, eroded	14556659	90	12	46	48	64	.37	1.420	5.500	34.300	22.500	0.180	38.000	2.000	1.100	0.750	50.000	Silty clay loam
+IA099	Jasper	407691	76D2	Ladoga silt loam, 9 to 14 percent slopes, eroded	14556659	90	12	46	64	81	.43	1.420	5.500	33.700	21.400	0.180	36.000	2.000	1.100	0.750	48.000	Silty clay loam
+IA099	Jasper	407691	76D2	Ladoga silt loam, 9 to 14 percent slopes, eroded	14556659	90	12	46	81	114	.43	1.420	5.800	33.100	20.200	0.180	34.000	2.000	3.000	0.750	45.000	Silty clay loam
+IA099	Jasper	407691	76D2	Ladoga silt loam, 9 to 14 percent slopes, eroded	14556659	90	12	46	114	130	.49	1.460	6.000	31.800	18.200	0.180	30.000	2.000	3.000	0.500	41.000	Silty clay loam
+IA099	Jasper	407691	76D2	Ladoga silt loam, 9 to 14 percent slopes, eroded	14556659	90	12	46	130	152	.49	1.360	6.100	29.400	14.400	0.170	26.000	2.000	9.000	0.250	36.000	Silt loam
+IA099	Jasper	407698	822D2	Lamoni silty clay loam, 9 to 14 percent slopes, moderately eroded	14556589	95	12	46	0	25	.37	1.480	6.400	34.300	23.000	0.190	33.500	18.700	3.000	2.700	40.000	Silty clay loam
+IA099	Jasper	407698	822D2	Lamoni silty clay loam, 9 to 14 percent slopes, moderately eroded	14556589	95	12	46	25	127	.28	1.600	5.800	33.000	22.500	0.150	44.000	26.900	0.040	1.250	55.000	Clay
+IA099	Jasper	407698	822D2	Lamoni silty clay loam, 9 to 14 percent slopes, moderately eroded	14556589	95	12	46	127	152	.32	1.650	6.500	33.200	24.900	0.160	36.000	30.900	0.700	0.250	42.500	Clay loam
+IA099	Jasper	407703	93D2	Shelby-Adair complex, 9 to 14 percent slopes, moderately eroded	14556504	60	12	46	0	20	.32	1.530	6.200	29.500	16.500	0.170	22.500	35.400	9.000	2.700	40.000	Loam
+IA099	Jasper	407703	93D2	Shelby-Adair complex, 9 to 14 percent slopes, moderately eroded	14556504	60	12	46	20	28	.28	1.530	6.200	32.400	21.500	0.170	32.500	34.700	3.000	1.500	40.000	Clay loam
+IA099	Jasper	407703	93D2	Shelby-Adair complex, 9 to 14 percent slopes, moderately eroded	14556504	60	12	46	28	107	.32	1.600	6.200	31.600	20.700	0.170	32.500	34.700	3.000	0.500	37.500	Clay loam
+IA099	Jasper	407703	93D2	Shelby-Adair complex, 9 to 14 percent slopes, moderately eroded	14556504	60	12	46	107	183	.32	1.600	7.500	31.400	20.400	0.170	32.500	34.700	3.000	0.250	37.500	Clay loam
+IA099	Jasper	407707	993D2	Gara-Armstrong loams, 9 to 14 percent slopes, moderately eroded	14556594	50	12	46	0	20	.32	1.530	6.500	30.200	17.600	0.170	25.000	35.400	9.000	2.500	40.000	Loam
+IA099	Jasper	407707	993D2	Gara-Armstrong loams, 9 to 14 percent slopes, moderately eroded	14556594	50	12	46	20	107	.32	1.650	5.500	30.800	20.300	0.170	31.500	35.300	3.000	0.250	35.000	Clay loam
+IA099	Jasper	407707	993D2	Gara-Armstrong loams, 9 to 14 percent slopes, moderately eroded	14556594	50	12	46	107	152	.32	1.700	7.000	30.400	20.600	0.170	31.000	35.400	3.000	0.250	35.000	Clay loam

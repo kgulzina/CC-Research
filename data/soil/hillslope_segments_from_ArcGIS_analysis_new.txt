@@ -1,0 +1,232 @@
+slope size estimates
+soil estimates
+prairie estimates
+
+basswood1
+115 meters long
+48 meters wide
+
+soil top to bottom
+46m 76c2 407690
+43m 76d2 407691
+26m 822d2 407698
+
+prairie:
+80m above prairie
+35m prairie
+
+
+
+
+basswood2
+110 meters long
+53 meters wide
+
+soil top to bottom
+43m 76c2 407690
+23m 76d2 407691
+44m 822d2 407698
+
+prairie top to bottom
+25m above prairie
+3m prairie
+46m between prairie
+38m prairie
+
+
+
+
+basswood3
+95 meters long
+38 meters wide
+
+soil top to bottom
+14m 76c2 407690
+51m 76d2 407691
+30m 822d2 407698
+
+prairie top to bottom:
+13m above prairie
+7m prairie
+42 between prairie
+33m prairieS
+
+
+
+basswood4
+118 meters long
+52 meters wide
+
+soil top to bottom
+23m 76c2 407690
+60m 76d2 407691
+35m 822d2 407698
+
+prairie:
+26m above prairie
+6m prairie
+48m between prairie
+37m prairie
+
+
+
+
+basswood5
+131 meters long
+93 m wide
+
+soil profile high to low
+29 lagoda 
+34 lagoda
+81 993d2 gara
+
+prairie:
+43 above
+6 prairie
+49 between
+46 prairie
+
+
+
+
+
+
+basswood6
+137 m long
+58 m wide
+
+soil profile high to low
+25m 76c2 407690
+47m 76d2 407691
+65m 993d2 407707
+
+no prairie
+
+
+interim1
+291 m long
+106 m wide
+
+soil profile 1 high to low
+111m 281c2 407651
+125m 222d2 407636
+55m 5b 407671
+
+soil profile 2 high to low
+38 281b 407650
+34 76c2 407690
+147 222d2 407636
+72 5b 407671
+
+prairie high to low:
+114 before prairie
+8m prairie
+54 between prairie
+7m prairie
+64 m between prairie
+42 m prairie
+
+
+
+
+interim2
+270 m long
+117 m wide
+
+soil top to bottom
+11 281b 407650
+71 76c2 407690
+109 222d2 407636
+80 5b 407671
+
+prairie:
+190 before prairie
+80 prairie
+
+
+
+
+interim3
+123 m long
+66 m wide
+
+soil high to low
+28m 76c2 407690
+95m 93d2 407703
+
+prairie: none
+
+
+
+
+orbweaver1
+169 m long
+82 m wide
+
+soil, high to low
+6m 281c2 407651
+126m 76d2 407691
+37m 179d2 407623
+
+prairie
+119m before prairie
+50m of prairie
+
+
+
+
+
+orbweaver2
+201 m long
+126 m wide
+
+soil, high to low elevation
+46m 281c2 407651
+54m 76d2 407691
+101m 5b 407671
+
+prairie:
+17m before prairie
+12m of prairie
+46 between prairie
+10m of prairie
+63m before prairie
+53m of prairie
+
+
+
+
+
+
+orbweaver3
+226 m long
+49 m wide
+
+soil, high to low elevation
+123 m 281 B 407650
+46m 281c2 407651
+57m 76d2 407691
+
+prairie: 
+none
+
+
+ID Code Key:
+
+"179D2"|"Gara loam, 9 to 14 percent slopes, moderately eroded"|"Consociation"||3759|||||||"Farmland of statewide importance"||||||42|||||"13688"|"407623"
+
+"93D2"|"Shelby-Adair complex, 9 to 14 percent slopes, moderately eroded"|"Complex"||7306|||||||"Farmland of statewide importance"||||||36|||||"13688"|"407703"
+
+"281C2"|"Otley silty clay loam, 5 to 9 percent slopes, eroded"|"Consociation"||15092|||||||"Farmland of statewide importance"|||||"Order 2"|82|||||"13688"|"407651"
+
+"281B"|"Otley silty clay loam, 2 to 5 percent slopes"|"Consociation"||11883|||||||"All areas are prime farmland"|||||"Order 2"|91|||||"13688"|"407650"
+
+"5B"|"Ackmore-Colo complex, 2 to 5 percent slopes"|"Complex"||35432|||||||"Prime farmland if drained"||||||79|||||"13688"|"407671"
+
+"822D2"|"Lamoni silty clay loam, 9 to 14 percent slopes, moderately eroded"|"Consociation"||2940|||||||"Farmland of statewide importance"||||||12|||||"13688"|"407698"
+
+"222D2"|"Clarinda silty clay loam, 9 to 14 percent slopes, moderately eroded"|"Consociation"||496|||||||"Farmland of statewide importance"||||||16|||||"13688"|"407636"
+
+76d2 = "Ladoga silt loam, 9 to 14 percent slopes, eroded"|"Consociation"||5622|||||||"Farmland of statewide importance"|||||"Order 2"|49|||||"13688"|"407691"
+
+76c2 = "Ladoga silt loam, 5 to 9 percent slopes, eroded"|"Consociation"||4004|||||||"Farmland of statewide importance"|||||"Order 2"|75|||||"13688"|"407690"
