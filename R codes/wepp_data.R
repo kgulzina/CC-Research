@@ -199,48 +199,132 @@ hillslope_info %>% head()
 
 
 
+# WEPP - slope numerical input --------------------------------------------
+# write a function to convert slope into functional input given: n
+gen_slope <- function(n, hillslope_info) {
+    # get unique hillslope lengths
+    lengths <- unique(hillslope_info$length)
+    
+    # frame for data
+    d <- data.frame(t(1:(n+2)))
+    for (i in 1:36) {
+        # interval length
+        h = lengths[i] / (n-1)
+        
+        # which rows to select
+        rows <- which(hillslope_info$length == lengths[i])
+        
+        # watershed names
+        watersheds <- unique(hillslope_info$watershed)
+        
+        # how many original sections hillslope has
+        M = length(rows)
+        
+        # which hillslope
+        d[i,1:2] = c(hillslope_info$watershed[rows[1]], hillslope_info$hill[rows[1]])
+        d[i,3] = 0 #starts from zero
+        for (j in 1:(n-1)) {
+            temp = j*h
+            for (m in 2:M) { #first sublength is always 0
+                if (temp <= hillslope_info$sublength[rows[m]]) {
+                    d[i,j+3] <- hillslope_info$slope[rows[m]]
+                    break
+                }
+            }
+        }
+    }
+    return(d)
+}
+
+# generate numerical input: slope
+num_slope <- gen_slope(15, hillslope_info)
+num_slope %>% head()
+
+
+
+
+
 
 # WEPP - climate data - CLIGEN --------------------------------------------
 # This climate file was simulated from CLIGEN - Des Moines IA station for 12
 # years. I choose Des Moines station, since it is the closest one to the 
-# Neal Smith.
-climate <- read.table("data/climate/092.63x040.90.cli.txt",
+# Neal Smith. 2nd line in climate file = 1 0 0 means:
+# 1 - continuous simulation
+# 0 - no breakpoint data used
+# 0 - wind information exists - use Penman ET equation
+climate_cligen <- read.table("data/climate/092.63x040.90.cli.txt",
                       skip = 15,
                       header = FALSE,
                       quote = " ")
 # although, we have read data correctly there is problem in file format and
 # there are only 10 columns, 3 columns are lost. However, we will do not care
 # about them, we need only "day", "month", "year" and "precip"
-climate %>% head(20)
+climate_cligen %>% head(20)
 
 # dimension is far away from the real dim: 365*12 + 3 = 4383
-dim(climate)
+dim(climate_cligen)
 
 # give the column names
-colnames(climate) <- c("day",  "month", "year", "prcp", "dur",
+colnames(climate_cligen) <- c("day",  "month", "year", "prcp", "dur",
                        "tp", "ip", "tmax", "tmin", "rad",
                        "w-vl", "w-dir", "tdew")
+climate_cligen %>% glimpse()
 
-### use these lines if you are reading NS real climate file
-# write a code which gets rid of unused stuff - 3 columns
-# rows to skip:
-#skip <- is.na(climate$month)
 
-# I could try to add those three columns
-#mess <- climate[skip,1]
-#length(mess) 
-## 7692 rows which is not the sum of 4383, so I'll not try to fix it!
 
-# valid climate
-#climate <- climate[!skip,]
 
-# now, it is correct
-#climate %>% head(20)
-#dim(climate)
+# WEPP - climate data - NS ------------------------------------------------
+# It's areal climate file collected in NS station by Daryl Herzmann.
+# 2nd line in the climate file = 1 1 0 means:
+# 1 - continuous simulation
+# 1 - breakpoint data used
+# 0 - wind information exists - use Penman ET equation
+# This climate file contains less columns relative to CLIGEN file. More 
+# detailed information can be found on page 10 of wepp_usernum.pdf
+climate_ns <- read.csv("data/climate/NS.cli.txt",
+                         skip = 15,
+                         header = FALSE,
+                         sep = "\t")
+climate_ns %>% head(30) #read in desired format
 
-# how many years simulated:
-climate$year %>% unique() #12 years -- good
+# separate precipitaion and NA values
+cli_full <- climate_ns[!is.na(climate_ns$V2),]
+cli_na <- climate_ns[is.na(climate_ns$V2),] %>% 
+    select(V1)
 
+# add col names taken from wepp_usernum.pdf
+colnames(cli_full) <- c("day", "mon", "year", "nbrkpt", "tmax",
+                        "tmin", "rad", "w-vl", "w-dir", "tdew")
+
+# see if cli_fill is read correctly
+cli_full %>%  glimpse()
+cli_full %>% dim() #4383 = 12*365 + 3 (there are 3 leap years)
+
+# add two new columns: prcp and duration of rain/snow
+climate <- cbind(cli_full, prcp = 0, dur = 0)
+
+# learn breakpoints/prcp/dur
+brkpnt_rows <- which(cli_full$nbrkpt != 0)
+breakpoints <- cli_full$nbrkpt[brkpnt_rows]
+row <- 0
+count <- 0
+
+for (i in breakpoints) {
+    count <- count + 1
+    temp1 <- as.character(cli_na[row+1,]) %>% strsplit("   ")
+    row <- row + i
+    temp2 <- as.character(cli_na[row,]) %>% strsplit("   ")
+    if (length(temp2[[1]]) == 1) {
+        temp2 <- as.character(cli_na[row,]) %>% strsplit("  ")
+    }
+    # get daily total precipitation
+    prcp <- as.numeric(temp2[[1]][2])
+    # calculate duration
+    dur <- as.numeric(temp2[[1]][1]) - as.numeric(temp1[[1]][1])
+    climate[brkpnt_rows[count],11:12] <- c(prcp, dur)
+}
+
+climate %>% head(100)
 
 
 
@@ -274,7 +358,7 @@ colnames(soil_types) <- c("ID", "name", "MUKEY")
 soil_types
 
 # write it to .csv
-write.csv(soil_types, "soil_types.csv", row.names = FALSE)
+#write.csv(soil_types, "soil_types.csv", row.names = FALSE)
 
 ### We have more concrete dataset on soil_types from Gabe:
 soil_types_detailed <- read.csv("data/soil/strips_soils_data.txt",
@@ -324,7 +408,7 @@ get_env_results <- function() {
         # check if interim 1
         if (i == 8) {
             for (j in 1:4) {
-                path <- paste("data/env_results/071000081505_",
+                path <- paste("data/env_results/ns_station/071000081505_",
                               watersheds[i], "_", hills[j],
                               ".env", sep = "")
                 print(path)
@@ -341,7 +425,7 @@ get_env_results <- function() {
         # check if interim 3
         } else if (i == 9) {
             for (j in 1:2) {
-                path <- paste("data/env_results/071000081505_",
+                path <- paste("data/env_results/ns_station/071000081505_",
                               watersheds[i], "_", hills[j],
                               ".env", sep = "")
                 print(path)
@@ -356,7 +440,7 @@ get_env_results <- function() {
             }
         } else {
             for (j in 1:3) {
-                path <- paste("data/env_results/071000081505_",
+                path <- paste("data/env_results/ns_station/071000081505_",
                               watersheds[i], "_", hills[j],
                               ".env", sep = "")
                 print(path)
@@ -420,8 +504,9 @@ soil_loss %>% glimpse()
 # precipitation on that day.
 
 # additional days are probably in February, day = 29
-leap <- which(climate$month == 2 & climate$day == 29)
-climate[leap,] #precipitaion in those days maybe important.. Prof. Niemi?
+leap <- which(climate$mon == 2 & climate$day == 29)
+#precipitaion in those days maybe important: Prof. Niemi said to omit
+climate[leap,] 
 
 
 # get precipitation out of climate
@@ -439,7 +524,7 @@ get_prcp <- function(df) {
 }
 
 # add years columns to daily prcp
-prcp <- climate[-leap, 3:4] %>% 
+prcp <- climate[-leap, c(3,11)] %>% 
     get_prcp() %>% 
     mutate(year = 2007:2018)
 prcp %>% head()
@@ -460,6 +545,9 @@ annual_soil_loss %>% glimpse()
 annual_soil_loss %>% dim()
 ### comments: I think, I got finally, what I wanted!!!
 
+
+#### before writing the final dataset, add slope!!!!!!!
+
 # save as csv file: annual_soil_loss.csv
 write.csv(annual_soil_loss, file = "annual_soil_loss.csv", row.names = FALSE)
 
@@ -468,49 +556,12 @@ write.csv(annual_soil_loss, file = "annual_soil_loss.csv", row.names = FALSE)
 
 
 
-# Scalar wepp_data  -------------------------------------------------------
+# Scalar GP wepp_data  -----------------------------------------------------
 # It's needed to run the simplest model and see if we can get valid
-# results. It contains standardized and averaged inputs: temp, prcp, slope
-# write a function to convert slope into functional input given: n
-gen_slope <- function(n, hillslope_info) {
-    # get unique hillslope lengths
-    lengths <- unique(hillslope_info$length)
-    
-    # frame for data
-    d <- data.frame(t(1:(n+2)))
-    for (i in 1:36) {
-        # interval length
-        h = lengths[i] / (n-1)
-        
-        # which rows to select
-        rows <- which(hillslope_info$length == lengths[i])
-        
-        # watershed names
-        watersheds <- unique(hillslope_info$watershed)
-        
-        # how many original sections hillslope has
-        M = length(rows)
-        
-        # which hillslope
-        d[i,1:2] = c(hillslope_info$watershed[rows[1]], hillslope_info$hill[rows[1]])
-        d[i,3] = 0 #starts from zero
-        for (j in 1:(n-1)) {
-            temp = j*h
-            for (m in 2:M) { #first sublength is always 0
-                if (temp <= hillslope_info$sublength[rows[m]]) {
-                    d[i,j+3] <- hillslope_info$slope[rows[m]]
-                    break
-                }
-            }
-        }
-    }
-    return(d)
-}
+# results. It contains standardized and averaged inputs: prcp, slope, dur,
+# tmin, tmax, w-vl. (what about rad, w-dir, tdew??????)
+## write that dataset here!!!!!
 
-
-# generate numerical input: slope
-num_slope <- gen_slope(15, hillslope_info)
-num_slope %>% head()
 
 
 
