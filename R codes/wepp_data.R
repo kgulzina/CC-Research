@@ -7,7 +7,7 @@
 
 
 # Sourcing and libraries --------------------------------------------------
-source("supplementary_functions.R")
+source("R codes/supplementary_functions.R")
 library(devtools)
 library(dplyr)
 library(stringr)
@@ -477,73 +477,41 @@ gen_slope <- function(n, hillslope_info) {
     lengths <- unique(hillslope_info$length)
     
     # frame for data
-    d <- data.frame(t(1:(n+1))
+    d <- data.frame(t(1:(n+2)))
     for (i in 1:36) {
         # interval length
-        h = lengths[i] / n
+        h = lengths[i] / (n-1)
         
         # which rows to select
         rows <- which(hillslope_info$length == lengths[i])
         
+        # watershed names
+        watersheds <- unique(hillslope_info$watershed)
+        
         # how many original sections hillslope has
         M = length(rows)
         
-        d[i,0] = 0 #starts from zero
-        temp = 0
-        for (j in 0:n) {
-            temp = temp + h
-            for (m in 1:M) {
-                if (temp < hillslope_info$sublength[rows[m]]) {
-                    ### continue your thing here!!!
+        # which hillslope
+        d[i,1:2] = c(hillslope_info$watershed[rows[1]], hillslope_info$hill[rows[1]])
+        d[i,3] = 0 #starts from zero
+        for (j in 1:(n-1)) {
+            temp = j*h
+            for (m in 2:M) { #first sublength is always 0
+                if (temp <= hillslope_info$sublength[rows[m]]) {
+                    d[i,j+3] <- hillslope_info$slope[rows[m]]
+                    break
                 }
             }
         }
     }
+    return(d)
 }
 
 
+# generate numerical input: slope
+num_slope <- gen_slope(15, hillslope_info)
+num_slope %>% head()
 
-
-
-# Handling mismatch example -----------------------------------------------
-climate_daily <- read.table("data/climate_mismatch/weppdemo_daily.cli",
-                      skip = 15,
-                      header = FALSE,
-                      quote = " ")
-climate_daily %>% head(20)
-
-# dimension is far away from the real dim: 365*12 + 3 = 4383
-dim(climate_daily)
-
-# give the column names
-colnames(climate_daily) <- c("day",  "month", "year", "prcp", "dur",
-                       "tp", "ip", "tmax", "tmin", "rad", "w-vl", "w-dir", "tdew")
-
-# select the first year only
-climate_daily <- climate_daily %>% 
-    select(day, month, year, prcp) %>% 
-    filter(year == 2007)
-    
-
-# read env_result
-soil_daily <- read.table("data/climate_mismatch/daily.txt",
-                         skip = 3)
-colnames(soil_daily) <- c("day", "month", "year", "Precp", "Runoff", "IR.det",
-                        "Av.det", "Mx.det", "Point", "Av.dep", "Max.dep",
-                        "Point.1","Sed.Del", "ER")
-
-# select only needed part and rename year
-soil_daily <- soil_daily %>% 
-    select(day, month, year, Precp, Runoff, IR.det) %>% 
-    mutate(year = 2007)
-soil_daily
-
-# merge into one
-true_match <- merge(climate_daily, soil_daily, by = c("day", "month", "year"))
-true_match
-
-# write into csv
-write.csv(true_match, file = "truematch.csv")
 
 
 
