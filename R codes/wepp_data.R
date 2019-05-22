@@ -238,6 +238,8 @@ gen_slope <- function(n, hillslope_info) {
 
 # generate numerical input: slope
 num_slope <- gen_slope(15, hillslope_info)
+# give names to first two columns, ignore the rest
+colnames(num_slope) <- c("watershed", "hill")
 num_slope %>% head()
 
 
@@ -539,18 +541,20 @@ for (i in 1:12) {
     prcp[i,-366] <- log(prcp[i,-366] + min(prcp[i,prcp[i,-366] != 0]))
 }
 
-# we have to merge the datasets by years:
-annual_soil_loss <- merge(prcp, soil_loss, by = "year")
+# standardize slope: divide by 100 (as was done it original slope files)
+num_slope[,3:ncol(num_slope)] <- num_slope[,3:ncol(num_slope)] / 100
+
+# we have to merge the datasets by years/watershed/hill:
+annual_soil_loss <- merge(soil_loss, prcp, by = "year")
+annual_soil_loss <- merge(annual_soil_loss, num_slope, 
+                          by = c("watershed", "hill"))
 annual_soil_loss %>% glimpse()
 annual_soil_loss %>% dim()
+annual_soil_loss %>% head()
 ### comments: I think, I got finally, what I wanted!!!
-
-
-#### before writing the final dataset, add slope!!!!!!!
 
 # save as csv file: annual_soil_loss.csv
 write.csv(annual_soil_loss, file = "annual_soil_loss.csv", row.names = FALSE)
-
 
 
 
