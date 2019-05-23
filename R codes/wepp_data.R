@@ -231,6 +231,9 @@ gen_slope <- function(n, hillslope_info) {
                     break
                 }
             }
+            if (j == n-1) {
+                d[i,j+3] <- hillslope_info$slope[rows[M]]
+            }
         }
     }
     return(d)
@@ -240,7 +243,7 @@ gen_slope <- function(n, hillslope_info) {
 num_slope <- gen_slope(15, hillslope_info)
 # give names to first two columns, ignore the rest
 colnames(num_slope) <- c("watershed", "hill")
-num_slope %>% head()
+num_slope
 
 
 
@@ -269,7 +272,7 @@ dim(climate_cligen)
 # give the column names
 colnames(climate_cligen) <- c("day",  "month", "year", "prcp", "dur",
                        "tp", "ip", "tmax", "tmin", "rad",
-                       "w-vl", "w-dir", "tdew")
+                       "wvl", "wdir", "tdew")
 climate_cligen %>% glimpse()
 
 
@@ -296,7 +299,7 @@ cli_na <- climate_ns[is.na(climate_ns$V2),] %>%
 
 # add col names taken from wepp_usernum.pdf
 colnames(cli_full) <- c("day", "mon", "year", "nbrkpt", "tmax",
-                        "tmin", "rad", "w-vl", "w-dir", "tdew")
+                        "tmin", "rad", "wvl", "wdir", "tdew")
 
 # see if cli_fill is read correctly
 cli_full %>%  glimpse()
@@ -554,7 +557,7 @@ annual_soil_loss %>% head()
 ### comments: I think, I got finally, what I wanted!!!
 
 # save as csv file: annual_soil_loss.csv
-write.csv(annual_soil_loss, file = "annual_soil_loss.csv", row.names = FALSE)
+#write.csv(annual_soil_loss, file = "annual_soil_loss.csv", row.names = FALSE)
 
 
 
@@ -562,14 +565,45 @@ write.csv(annual_soil_loss, file = "annual_soil_loss.csv", row.names = FALSE)
 
 # Scalar GP wepp_data  -----------------------------------------------------
 # It's needed to run the simplest model and see if we can get valid
-# results. It contains standardized and averaged inputs: prcp, slope, dur,
-# tmin, tmax, w-vl. (what about rad, w-dir, tdew??????)
-## write that dataset here!!!!!
+# results. It contains standardized(?) and averaged inputs: slope, tmin,
+# tmax, w-vl; total dur, prcp (what about rad, w-dir, tdew??????)
 
+# summarise information from NS climate file
+climate %>% select(year, prcp, dur, tmin, tmax, wvl) %>%
+    group_by(year) %>% 
+    summarise(totprcp = sum(prcp),
+              totdur = sum(dur),
+              avgtmin = mean(tmin),
+              avgtmax = mean(tmax),
+              avgwvl = mean(wvl)) %>% 
+    unlist() %>% 
+    matrix(ncol = 6, byrow= FALSE) %>% 
+    data.frame() -> annual_prcp
 
+# set column names
+colnames(annual_prcp) <- c("year", "totprcp", "totdur",
+                           "avgtmin", "avgtmax", "avgwvl")
 
+# see if read id correctly
+annual_prcp %>% glimpse()
 
+# summarize information from slope files
+avg_slope <- cbind(num_slope[,1:2], 
+                   avgslope = apply(num_slope[,3:ncol(num_slope)], 1, mean))
+avg_slope
 
+# we have to merge the datasets by years/watershed/hill:
+annual_soil_loss_scalar <- merge(soil_loss, annual_prcp, by = "year")
+annual_soil_loss_scalar <- merge(annual_soil_loss_scalar, avg_slope, 
+                          by = c("watershed", "hill"))
+annual_soil_loss_scalar %>% glimpse()
+annual_soil_loss_scalar %>% dim()
+annual_soil_loss_scalar
+
+# save as csv file: annual_soil_loss.csv
+write.csv(annual_soil_loss_scalar, 
+          file = "annual_soil_loss_scalar.csv", 
+          row.names = FALSE)
 
 
 
