@@ -369,8 +369,8 @@ soil_types
 soil_types_detailed <- read.csv("data/soil/strips_soils_data.txt",
                                 header = TRUE,
                                 sep = "\t")
-soil_types_detailed
-
+soil_types_detailed %>% names()
+soil_types_detailed %>% glimpse()
 
 
 
@@ -604,6 +604,28 @@ annual_soil_loss_scalar
 write.csv(annual_soil_loss_scalar, 
           file = "annual_soil_loss_scalar.csv", 
           row.names = FALSE)
+
+
+
+
+
+# Exploring datasets ------------------------------------------------------
+library(ggplot2)
+# soil loss
+annual_soil_loss_scalar %>% ggplot(aes(soil_loss)) +
+    geom_histogram(bins = 9) + facet_grid(hill ~ watershed)
+
+# precipitation
+annual_soil_loss_scalar %>% ggplot(aes(totprcp)) +
+    geom_histogram(bins = 9) + facet_grid(hill ~ watershed)
+
+# duration
+annual_soil_loss_scalar %>% ggplot(aes(totdur)) +
+    geom_histogram(bins = 9) + facet_grid(hill ~ watershed)
+
+# slope ??
+
+
 
 
 
