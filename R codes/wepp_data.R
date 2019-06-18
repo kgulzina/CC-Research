@@ -241,6 +241,7 @@ gen_slope <- function(n, hillslope_info) {
 
 # generate numerical input: slope
 num_slope <- gen_slope(15, hillslope_info)
+
 # give names to first two columns, ignore the rest
 colnames(num_slope) <- c("watershed", "hill")
 num_slope
@@ -294,8 +295,8 @@ climate_ns %>% head(30) #read in desired format
 
 # separate precipitaion and NA values
 cli_full <- climate_ns[!is.na(climate_ns$V2),]
-cli_na <- climate_ns[is.na(climate_ns$V2),] %>% 
-    select(V1)
+cli_na <- climate_ns[is.na(climate_ns$V2),1] #%>% 
+    #select(V1)
 
 # add col names taken from wepp_usernum.pdf
 colnames(cli_full) <- c("day", "mon", "year", "nbrkpt", "tmax",
@@ -316,11 +317,11 @@ count <- 0
 
 for (i in breakpoints) {
     count <- count + 1
-    temp1 <- as.character(cli_na[row+1,]) %>% strsplit("   ")
+    temp1 <- as.character(cli_na[row+1]) %>% strsplit("   ")
     row <- row + i
-    temp2 <- as.character(cli_na[row,]) %>% strsplit("   ")
+    temp2 <- as.character(cli_na[row]) %>% strsplit("   ")
     if (length(temp2[[1]]) == 1) {
-        temp2 <- as.character(cli_na[row,]) %>% strsplit("  ")
+        temp2 <- as.character(cli_na[row]) %>% strsplit("  ")
     }
     # get daily total precipitation
     prcp <- as.numeric(temp2[[1]][2])
@@ -557,7 +558,7 @@ annual_soil_loss %>% head()
 ### comments: I think, I got finally, what I wanted!!!
 
 # save as csv file: annual_soil_loss.csv
-#write.csv(annual_soil_loss, file = "annual_soil_loss.csv", row.names = FALSE)
+write.csv(annual_soil_loss, file = "annual_soil_loss_not_stdrzd.csv", row.names = FALSE)
 
 
 

@@ -17,8 +17,8 @@ library(Matrix)
 # Conventions -------------------------------------------------------------
 ## sample size and Time: T << n
 #### warning!!! Time = actual time - 1 = 365 - 1 = 364
-n <- 120 # for more sample size I am getting more stable estimates!
-Time <- 364
+#n <- 120 # for more sample size I am getting more stable estimates!
+#Time <- 364
 q <- 1 #number of harmonics
 rho <- 0.99
 sigmasq <- 1
@@ -33,7 +33,7 @@ source('R codes/loglkl_with_penalty.R')
 
 # Data --------------------------------------------------------------------
 d <- read.csv("data/final_csv/annual_soil_loss.csv") #home/kgulzina/cc/
-d <- cbind(d[1:n,-c(1:4)], d[1:n, 4])
+d <- cbind(d[,-c(1:4)], d[, 4])
 
 ### commments: here first 365 columns are for precipitation in (mm),
 # the las columnt is output = annual soil loss in (kg/m^2).
@@ -71,7 +71,7 @@ theta
 
 # Two numerical inputs ----------------------------------------------------
 ## we need new dynamic_loglkl_mvn_penalty function
-dynamic_loglkl_mvn_penalty2 <- function(theta, d) {
+dynamic_lkl_mvn_penalty2 <- function(theta, d) {
     #
     # Args:
     #   theta:
@@ -133,11 +133,13 @@ pars_coef
 
 
 # Run double input GP model -----------------------------------------------
+n <- 20
+rows <- sample(1:432, n)
 fun2_gp_est <- optim(par = pars_coef, 
-                       dynamic_loglkl_mvn_penalty2, 
-                       d = d, 
+                       dynamic_lkl_mvn_penalty2, 
+                       d = d[rows,], 
                        control = list(fnscale = -1,
-                                      maxit = 1000000))
+                                      maxit = 100))
 fun2_gp_est
 theta
 
@@ -146,9 +148,69 @@ theta
 
 
 
+
 # One scalar, one functional input ----------------------------------------
 ## we need new dynamic_loglkl_mvn_penalty function
-dynamic_loglkl_mvn_penalty2 <- function(theta, d) {
+lkl_sf_gp <- function(theta, d) {
+    #
+    # Args:
+    #   theta:  parameters = (w1, w2, lambda) in a vector form
+    #   d:      data frame, last column is response Y, others are input X's
+    #
+    # Output:
+    #   result: likelihood value
+    
+    # constants
+    n <- nrow(d)
+    thetal <- length(theta)
+    q <- (thetal-2) / 2
+    
+    # penalty on w
+    basis <- generate_trig_basis(14, q)
+    logit_w <- theta[2:(thetal-1)]%*%basis
+    
+    # get w
+    w <- exp(logit_w)/(1+exp(logit_w))
+    
+    # calculate the covariance matrix for yw
+    omega <- gcalc_corr_scalar(d, c(theta[1], w)) + diag(x = theta[thetal],
+                                                         nrow = n,
+                                                         ncol = n)
+    
+    # data model: log_likelihood 
+    p_y <- dmvnorm(d[,ncol(d)], mean = rep(0, n), sigma = omega)  
+    
+    # the posterior which will be maximized
+    result <- p_y
+    
+    return(result)
+}
+
+
+
+# Estimation --------------------------------------------------------------
+pars_theta <- c(0.5, 0.5, 0.2, 0.1, 0.1)
+
+# results
+# n = 20, pars_theta <- c(0.5 , 0.5, 0.1) 
+n <- 20
+rows <- sample(1:432, n)
+sf_gp_est <- optim(par = pars_theta, 
+                   lkl_sf_gp, 
+                   d = d_sf[rows,], 
+                   control = list(fnscale = -1,
+                                  maxit = 1000))
+sf_gp_est
+
+
+
+
+
+
+
+
+# Test on wepp data with penalty ------------------------------------------
+dynamic_lkl_mvn_penalty_ridge <- function(theta, d) {
     #
     # Args:
     #   theta:
@@ -158,15 +220,18 @@ dynamic_loglkl_mvn_penalty2 <- function(theta, d) {
     #   result:
     
     # some constants
-    time1 <- ncol(d)-20
+    n <- nrow(d)
+    time1 <- ncol(d)-17
     time2 <- 14 #fixed for now
     
     # length of theta parameter
-    thetalength <- length(theta) / 2
+    lambdal <- length(theta)
+    thetalength <- (lambdal - 1) / 2
+    
     
     # divide coefficients into two
     theta1 <- theta[1:thetalength]
-    theta2 <- theta[-(1:thetalength)]
+    theta2 <- theta[-c(1:thetalength,lambdal)]
     
     # q is fixed for both   
     q <- (length(theta1) - 1) / 2
@@ -188,12 +253,13 @@ dynamic_loglkl_mvn_penalty2 <- function(theta, d) {
     # combine two weights into one
     wv <- c(w,v)
     
-    # calculate the covariance matrix for ywv
-    ## there is something wroooonnnnngggg!!!!!!!
-    omega <- gcalc_corr(d,wv)
+    # calculate the covariance matrix for ywv + penalty
+    omega <- gcalc_corr(d,wv) + diag(theta[lambdal],
+                                     ncol = n,
+                                     nrow = n)
     
     # data model: log_likelihood 
-    p_ywv <- dmvnorm(d[,4], mean = rep(0, nrow(d)), sigma = omega)  
+    p_ywv <- dmvnorm(d[,ncol(d)], mean = rep(0, nrow(d)), sigma = omega)  
     
     # the posterior which will be maximized
     result <- p_ywv
@@ -203,24 +269,22 @@ dynamic_loglkl_mvn_penalty2 <- function(theta, d) {
 
 
 
-# Initial values for scalar*funct input GP model ---------------------------------
-theta <- c(0.8, 0.5, 0.5)
-pars_coef <- c(theta, theta)
+# Initial values for double GP input model ---------------------------------
+pars_coef <- c(0.5, 0.1, 0.1, 0.5, 0.1, 0.1, 5)
+#pars_coef <- c(simulate_coeff_dlm(q), simulate_coeff_dlm(q))
 pars_coef
 
 
 
-# Run scalar*funct input GP model -----------------------------------------------
+# Run double input GP model -----------------------------------------------
+n <- 20
+rows <- sample(1:432, n)
 fun2_gp_est <- optim(par = pars_coef, 
-                     dynamic_loglkl_mvn_penalty2, 
-                     d = d, 
+                     dynamic_lkl_mvn_penalty_ridge, 
+                     d = d[rows,], 
                      control = list(fnscale = -1,
-                                    maxit = 1000000))
+                                    maxit = 1000))
 fun2_gp_est
-theta
-
-
-
 
 
 

@@ -131,6 +131,31 @@ dev.off()
 
 
 
+# Visualize hillslope by height and slope ---------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
