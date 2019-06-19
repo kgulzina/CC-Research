@@ -558,7 +558,7 @@ annual_soil_loss %>% head()
 ### comments: I think, I got finally, what I wanted!!!
 
 # save as csv file: annual_soil_loss.csv
-write.csv(annual_soil_loss, file = "annual_soil_loss_not_stdrzd.csv", row.names = FALSE)
+write.csv(annual_soil_loss, file = "annual_soil_loss.csv", row.names = FALSE)
 
 
 

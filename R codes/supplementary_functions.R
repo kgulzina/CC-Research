@@ -91,8 +91,9 @@ gcalc_corr <- function(d,w) { #retriev x's from d
     omega <- matrix(NA, nrow = n, ncol = n)
     
     for(i in 1:n){
-        for(j in 1:n){
+        for(j in i:n){
             omega[i,j] <- exp(-sum(w*(d[i,-ncol(d)]-d[j,-ncol(d)])^2))
+            omega[j,i] <- omega[i,j]
         }
     }
     return(omega)

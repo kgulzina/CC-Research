@@ -56,8 +56,9 @@ gcalc_corr_scalar <- function(d,w) {
     omega <- matrix(NA, nrow = n, ncol = n)
     
     for(i in 1:n){
-        for(j in 1:n){
+        for(j in i:n){
             omega[i,j] <- exp(sum(-w*(d[i,-y] - d[j,-y])^2))
+            omega[j,i] <- omega[i,j]
         }
     }
     return(omega)

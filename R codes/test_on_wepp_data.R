@@ -254,9 +254,9 @@ dynamic_lkl_mvn_penalty_ridge <- function(theta, d) {
     wv <- c(w,v)
     
     # calculate the covariance matrix for ywv + penalty
-    omega <- gcalc_corr(d,wv) + diag(theta[lambdal],
-                                     ncol = n,
-                                     nrow = n)
+    omega <- gcalc_corr(d,wv) #+ diag(theta[lambdal],
+                              #       ncol = n,
+                              #       nrow = n)
     
     # data model: log_likelihood 
     p_ywv <- dmvnorm(d[,ncol(d)], mean = rep(0, nrow(d)), sigma = omega)  
