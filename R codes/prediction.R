@@ -4,7 +4,177 @@
 ## Date: 06/18/19 - present
 
 
-# get some information from the last summer code
+
+
+# Libraries --------------------------------------------------------------
+library(dplyr)
+library(ggplot2)
+library(plotly)
+library(lattice)
+source("R codes/supplementary_functions.R")
+
+
+
+
+# Real data - Scalar case -------------------------------------------------
+d <- read.csv("data/final_csv/annual_soil_loss_not_stdrzd.csv")
+d_scalar <- data.frame(type = "wepp",
+                       total_prcp = apply(d[,5:369], 1, sum),
+                       avg_slope = apply(d[370:384], 1, mean),
+                       soil_loss = d[,4]
+                       )
+# standardize
+d_scalar[,2] <- log(d_scalar[,2] + min(d_scalar[d_scalar[,2] != 0,2]))
+d_scalar[,3] <- d_scalar[,3] / 100
+
+# add new slope and precipitation grid
+d_emulator <- data.frame(type = "emulator",
+                         total_prcp = rep(seq(from = min(d_scalar$total_prcp),
+                                          to = max(d_scalar$total_prcp),
+                                          length.out = 20), each = 36),
+                         avg_slope = rep(seq(from = min(d_scalar$avg_slope),
+                                         to = max(d_scalar$avg_slope),
+                                         length.out = 36), 20)
+                         )
+d_predicted <- data.frame(type = "predicted",
+                          total_prcp = d_scalar$total_prcp,
+                          avg_slope = d_scalar$avg_slope
+    
+)
+
+
+
+
+# MLE estimates -----------------------------------------------------------
+# theta = (w_1, w_2, lambda)
+theta_mle <- c(0.529489806, 0.123338935, 0.003394897)
+
+
+
+# Code predictor - last summer --------------------------------------------
+# constants
+sigma <- gcalc_corr_scalar(d_scalar[,-1], theta_mle[-3]) + 
+    diag(x = theta_mle[3], nrow = n, ncol = n)
+sigma_inv <- solve(sigma)
+
+
+# functions
+calc_sigma_star <- function(d, xhat, mle) {
+    n <- nrow(d)
+    res <- c()
+    for (i in 1:n) {
+        res[i] <- exp(-mle[1]*(d[i,1]-xhat[1])^2 - mle[2]*(d[i,2]-xhat[2])^2)
+        if (d[i,1] == xhat[1] & d[i,2] == xhat[2]) {
+            # add nugget
+            res[[i]] <- res[[i]] + mle[3]
+        }
+    }
+    return(res)
+}
+
+
+
+emulate_soil_loss <- function(d, xhat, mle, sigma_inv) {
+# this code emulates soil loss: y*/y >> mean as a prediction
+    sigma_star <- calc_sigma_star(d, xhat, mle) %>% unlist()
+    
+    # yhat = sigma_star'sigma^{-1}y
+    yhat <- sigma_star%*%sigma_inv%*%d[,3]
+    return(yhat)
+}
+
+
+# example
+xhat <- d_predicted[1,-1]
+emulate_soil_loss(d_scalar[,-1], xhat, theta_mle, sigma_inv)
+
+
+
+# Visualization -----------------------------------------------------------
+## wepp data
+wepp_3d <- plot_ly(
+        x = d_scalar$avg_slope, 
+        y = d_scalar$total_prcp, 
+        z = d_scalar$soil_loss, 
+        type="scatter3d", 
+        mode="markers")
+
+
+## emulator
+soil_loss <- c()
+nhat <- nrow(d_emulator)
+for (i in 1:nhat) {
+    soil_loss[i] <- emulate_soil_loss(d_scalar[,-1], 
+                                           d_emulator[i, -1], 
+                                           theta_mle,
+                                           sigma_inv)
+}
+d_emulator <- cbind(d_emulator, soil_loss)
+d_mixed <- rbind(d_scalar, d_emulator)
+
+
+
+# predict on wepp places
+soil_loss <- c()
+nhat <- nrow(d_predicted)
+for (i in 1:nhat) {
+    soil_loss[i] <- emulate_soil_loss(d_scalar[,-1], 
+                                      d_predicted[i, -1], 
+                                      theta_mle,
+                                      sigma_inv)
+}
+d_predicted <- cbind(d_predicted, soil_loss)
+d_mixed <- rbind(d_mixed, d_predicted)
+
+
+## plot mixed
+wepp_emulator_3d <- plot_ly(
+    x = d_mixed$avg_slope, 
+    y = d_mixed$total_prcp, 
+    z = d_mixed$soil_loss, 
+    type="scatter3d", 
+    mode="markers",
+    color = d_mixed$type)
+wepp_emulator_3d
+
+
+
+
+
+# Heat maps ---------------------------------------------------------------
+## wepp data - convert to matrix
+levelplot(soil_loss ~ avg_slope*total_prcp, 
+          data = d_emulator, 
+          col.regions = heat.colors(100)[length(heat.colors(100)):1], 
+          main="")
+
+
+plot_ly(
+    x = d_scalar$avg_slope,
+    y = d_scalar$total_prcp,
+    z = d_scalar$soil_loss,
+    type = "contour"
+)
+
+## emulator
+levelplot(soil_loss ~ avg_slope*total_prcp, 
+          data = d_scalar, 
+          col.regions = heat.colors(100)[length(heat.colors(100)):1], 
+          main="")
+
+
+plot_ly(
+    x = d_emulator$avg_slope,
+    y = d_emulator$total_prcp,
+    z = d_emulator$soil_loss,
+    type = "contour"
+)
+
+
+
+
+
+
 
 
 
