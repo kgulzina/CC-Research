@@ -52,8 +52,8 @@ prcp_2018 <- climate_for_visual %>% filter(year == 2018) %>%
 ggarrange(prcp_2007, prcp_2018, nrow = 2)
 
 # publish
-dev.copy(pdf,'prcp.pdf')
-dev.off()
+#dev.copy(pdf,'prcp.pdf')
+#dev.off()
 
 
 ## plot two hillslope slope profiles: Basswood1 hill1, Orbweaver2 hill3
