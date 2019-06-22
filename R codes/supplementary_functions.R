@@ -102,6 +102,33 @@ gcalc_corr <- function(d,w) { #retriev x's from d
 
 
 
+gcalc_corr_scalar <- function(d,w) {
+    # Calculates covariances between X's using correlation form used in the GP
+    # model assumptions: to find MLE of w(t)
+    #
+    # Args: 
+    #   d: data frame, last column is response Y, others are input X's
+    #   w: weights, in a vector form
+    #
+    # Output:
+    #   omega: correlation matrix of size n
+    
+    n <- nrow(d)
+    y <- ncol(d)
+    omega <- matrix(NA, nrow = n, ncol = n)
+    
+    for(i in 1:n){
+        for(j in i:n){
+            omega[i,j] <- exp(-sum(w*(d[i,-y] - d[j,-y])^2))
+            omega[j,i] <- omega[i,j]
+        }
+    }
+    return(omega)
+}
+
+
+
+
 calc_gradient_num <- function(f,w,d,epsilon=10^-6){
 # Calculates the gradient of a function numerically
 # 
@@ -600,6 +627,10 @@ dynamic_loglkl_mvn_penalty <- function(theta, d) {
 
 
 
+# repeat rows
+rep_row <- function(x, n) {
+    matrix(rep(x, each = n), nrow = n)
+}
 
 
 
