@@ -58,8 +58,9 @@ gcalc_corr_scalar <- function(d,w) {
     omega <- matrix(NA, nrow = n, ncol = n)
     
     for(i in 1:n){
-        for(j in 1:n){
+        for(j in i:n){
             omega[i,j] <- exp(sum(-w*(d[i,-y] - d[j,-y])^2))
+            omega[j,i] <- omega[i,j]
         }
     }
     return(omega)
@@ -83,7 +84,7 @@ lkl_sf_gp <- function(theta, d) {
     q <- (thetal-2) / 2
     
     # penalty on w
-    basis <- generate_trig_basis(14, q)
+    basis <- generate_trig_basis(15, q)
     logit_w <- theta[2:(thetal-1)]%*%basis
     
     # get w
