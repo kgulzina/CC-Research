@@ -45,9 +45,29 @@ d_sf_emulator <- cbind(d_sf_emulator,
 
 
 # MLE estimates -----------------------------------------------------------
-# output plots end with 1 (using this one right now *** largest lkl)
+# lkl = 5.490827e+169
 theta_mle <- c(0.011126216, -25.682813936, 4.347803503, 
                13.044304027, 0.003774865)
+
+# largest lkl = 3.585272e+248
+theta_mle <- c(3.175177e-02, -1.970449e+02,  1.891088e+02,
+              8.627757e+01,  3.819011e-03)
+
+# cvg = 0, lkl = 1.619814e+175
+theta_mle <- c(9.962087e-03, -2.165815e+02, -4.978847e+01,
+               1.983269e+02,  3.487355e-03)
+
+# cvg = 1, lkl = lkl = 2.560958e+248, n = 432
+theta_mle <- c(9.690187e-03, -3.933811e+02, -2.216817e+01,
+               3.863279e+02,  3.750334e-03)
+
+# middle good
+#theta_mle <- c(0.010058478, -13.062947983,  -0.684352483,
+#               -0.610023781,   0.003783663)
+
+# little good
+# theta_mle <- c(0.009203076, -38.852993474,  30.923483013,
+#               8.634562892,   0.003552888)
 
 # very bad
 #theta_mle <- c(3.929260e-02, -1.940042e+02,  2.535889e+02,
@@ -190,7 +210,7 @@ d_sf_mixed[c(1:12, 433:444),] %>% ggplot(aes(x = total_prcp,
     theme_linedraw()
 
 # publish
-dev.copy(pdf,'bwd1_sf.pdf')
+dev.copy(pdf,'bwd4_sf.pdf')
 dev.off()
 
 
@@ -205,7 +225,7 @@ d_sf_mixed[c(385:396, 445:456),] %>% ggplot(aes(x = total_prcp,
     theme_linedraw()
 
 # publish
-dev.copy(pdf,'orb2_sf.pdf')
+dev.copy(pdf,'orb4_sf.pdf')
 dev.off()
 
 
