@@ -49,7 +49,7 @@ calc_corr_deterministic <- function(X, t, n) {
 
 
 
-calc_corr_sampled <- function(X, t, n, w){
+calc_corr_sampled <- function(X, t, n, theta){
 # Calculates covariances between simulated X's using correlation form used in 
 # the GP model assumptions: sampled w(t) from specific density
 #
@@ -62,11 +62,17 @@ calc_corr_sampled <- function(X, t, n, w){
 # Output:
 #   omega: correlation matrix of size n    
     
+    l <- length(theta)
     omega <- matrix(NA, nrow = n, ncol = n)
     time <- 0:t
     for(i in 1:n) {
-        for(j in 1:n) {
-            omega[i,j] <- exp(-sum(w*(X[i,]-X[j,])^2))
+        for(j in i:n) {
+            omega[i,j] <- exp(-sum(theta[-l]*(X[i,]-X[j,])^2))
+            if (i == j) {
+                omega[i,j] = omega[i,j] + theta[l]
+            } else {
+                omega[j,i] <- omega[i,j]
+            }
         }
     }
     return(omega)
@@ -87,7 +93,6 @@ gcalc_corr <- function(d,w) { #retriev x's from d
 #   omega: correlation matrix of size n
     
     n <- nrow(d)
-    time <- ncol(d)-1
     omega <- matrix(NA, nrow = n, ncol = n)
     
     for(i in 1:n){
@@ -153,7 +158,7 @@ calc_gradient_num <- function(f,w,d,epsilon=10^-6){
 
 
 
-simulate_d <- function(t, n, w){
+simulate_d <- function(t, n, theta){
 # Simulates data: both X and Y according to GP model described in 
 # "CC-Process" log-file
 # 
@@ -165,13 +170,13 @@ simulate_d <- function(t, n, w){
 # Outputs:
 # d: data frame, last column is response Y, others are input X's 
     
-    sigma <- calc_Sigma(t+1, rho = 0.95)
+    sigma <- calc_Sigma(t+1, rho = 0.99)
     
     # simulate X's
     x_values <- mvrnorm(n, rep(0, t+1), sigma)
     
-    #calculate omega for Y
-    omega <- calc_corr_sampled(x_values, t, n, w)
+    # calculate omega for Y
+    omega <- calc_corr_sampled(x_values, t, n, theta)
     
     # simulate Y's
     y <- rmvnorm(1, mean = rep(0, n), sigma = omega)
@@ -197,7 +202,7 @@ simulate_trunc_d <- function(t, n, w){
 # Outputs:
 # d: data frame, last column is response Y, others are input X's 
     
-    sigma <- calc_Sigma(t+1, rho = 0.95)
+    sigma <- calc_Sigma(t+1, rho = 0.99)
     
     # simulate X's (leaving X's as it is)
     x_values <- mvrnorm(n, rep(0, t+1), sigma)
@@ -625,6 +630,46 @@ dynamic_loglkl_mvn_penalty <- function(theta, d) {
     return(result)
 }
 
+
+dynamic_lkl_mvn_penalty_ridge <- function(theta, d) {
+    #
+    # Args:
+    #   theta:
+    #   d:
+    #
+    # Output:
+    #   result:
+    
+    # some constants
+    n <- nrow(d)
+    time <- ncol(d)-2
+    
+    # length of theta parameter
+    lambdal <- length(theta)
+    
+    # q is fixed for both   
+    q <- (length(theta) - 2) / 2
+    
+    # penalty on w
+    basis <- generate_trig_basis(time+1, q)
+    logit_w <- theta[-lambdal]%*%basis
+    
+    # get w
+    w <- exp(logit_w)/(1+exp(logit_w))
+    
+    # calculate the covariance matrix for ywv + penalty
+    omega <- gcalc_corr(d, w) + diag(theta[lambdal],
+                                     ncol = n,
+                                     nrow = n)
+    
+    # data model: log_likelihood 
+    p_yw <- dmvnorm(d[,ncol(d)], mean = rep(0, nrow(d)), sigma = omega)  
+    
+    # the posterior which will be maximized
+    result <- p_yw
+    
+    return(result)
+}
 
 
 # repeat rows
