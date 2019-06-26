@@ -20,18 +20,18 @@ library(dlm)
 
 # Conventions -------------------------------------------------------------
 ## sample size and Time: T << n
-n <- 12 # for more sample size I am getting more stable estimates!
-Time <- 10
+n <- 432 # for more sample size I am getting more stable estimates!
+Time <- 99 #in reality: T = 10
 q <- 1 #number of harmonics
 rho <- 0.99
 sigmasq <- 1
 
 ## to use supplementary functions:
-source('supplementary_functions.R')
-source('loglkl_with_penalty.R')
-source("assess_accuracy.R")
-source("3D_plot_loglkl.R")
-source("wepp_data.R")
+source('R codes/supplementary_functions.R')
+#source('loglkl_with_penalty.R')
+#source("assess_accuracy.R")
+#source("3D_plot_loglkl.R")
+#source("wepp_data.R")
 
 
 
@@ -47,25 +47,28 @@ source("wepp_data.R")
 #w <- simulate_log_w(Time)
 
 # Simulate coefficients for approach 3
-theta <- simulate_coeff_dlm(q)
+coef <- c(-25.682813936,  4.347803503,  13.044304027)
+lambda <- 0.04
 
 ## Approach 3 to simulate w:
-w <- simulate_w_dlm(theta, Time+1) #current
+w <- simulate_w_dlm(coef, Time+1) #current
+theta <- c(w, lambda)
 
 ## simulate data:
-d <- simulate_d(Time, n, w)
+#d_sim <- simulate_trunc_d(Time, n, theta)
+d_simulated <- simulate_d(Time, n, theta)
 
 ## simulate truncated data:
 #d <- simulate_trunc_d(Time, n, w) 
 
 ## real wepp data
-d <- wepp_data[,c(1:11, ncol(wepp_data))]
+#d <- wepp_data[,c(1:11, ncol(wepp_data))]
 
 
 
 # If Y’s are sampled correctly --------------------------------------------
 ## summary statistics and simple plot
-y <- d[,ncol(d)]
+y <- d_simulated[,ncol(d_simulated)]
 summary(y)
 plot(y)
 
@@ -105,20 +108,21 @@ pars1
 pars2 <- simulate_log_w(Time)
 pars2
 
-## set initial values foe coefficients
-pars_coef <- rep(0, 2*q+1)
-
+## set initial values for coefficients
+pars_coef <- c(coef, lambda)
+pars_coef <- c(simulate_coeff_dlm(q), 1)
 
 
 
 # Dynamic Linear Models ---------------------------------------------------
 est3_gr1_pars1 <- optim(par = pars_coef, 
-                        dynamic_loglkl_mvn_penalty, 
-                        d = d, 
+                        dynamic_lkl_mvn_penalty_ridge, 
+                        d = d_simulated, 
                         control = list(fnscale = -1,
                         maxit = 1000000))
 est3_gr1_pars1
-theta
+pars_coef
+
 
 
 
