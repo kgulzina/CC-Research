@@ -17,47 +17,48 @@ source("R codes/supplementary_functions.R")
 
 
 # Real data - Scalar case -------------------------------------------------
-d <- read.csv("data/final_csv/annual_soil_loss_not_stdrzd.csv")
-d_sf <- data.frame(type = "wepp",
-                   total_prcp = apply(d[,5:369], 1, sum),
-                   d[,370:384],
+d <- read.csv("data/final_csv/annual_soil_loss.csv")
+d_ff <- data.frame(type = "wepp",
+                   d[,5:384],
                    soil_loss = d[,4])
 
-# standardize precipitation amount
-d_sf[,2] <- log(d_sf[,2] + min(d_sf[d_sf[,2] != 0,2]))
+# choose years 2007 & 2018, and all slope profiles
+slope_profiles <- unique(d[,370:384])
+watersheds <- rep(unique(d$watershed), each = 3)
 
-# choose two differenet slope profiles: Basswood1&hill1 and Orbweaver2&hill3
-slope_profiles <- unique(d[,370:384])[c(1,33),]
+hills <- d %>% filter(year == 2007) %>% select(hill)
+years <- d[-c(4)] %>% 
+    unique() %>% 
+    filter( year == 2007 | year == 2018) 
 
-# add new slope and precipitation grid
-d_sf_emulator <- data.frame(type = "emulator",
-                            total_prcp = rep(seq(from = min(d_sf$total_prcp),
-                                                 to = max(d_sf$total_prcp),
-                                                 length.out = 12), times = 2)
-)
+# add 0.000001 to each year
+d_ff_emulator <- data.frame(type = "emulator",
+                            years
+                            )
 
-d_sf_emulator <- cbind(d_sf_emulator, 
-                       rbind(rep_row(slope_profiles[1,], 12),
-                             rep_row(slope_profiles[2,], 12)))
-
-
+# add small difference
+d_ff_emulator[,-c(1:5, 370:384)] <- d_ff_emulator[,-c(1:5, 370:384)] + 10^(-6)
 
 
 
 # MLE estimates -----------------------------------------------------------
 # theta = (w_1, w_2, lambda)
-theta_mle <- c(0.011126216, -25.682813936, 4.347803503, 
-               13.044304027, 0.003774865)
+theta_mle <- c(-2.192671e+02, -1.956970e+02,  1.769927e+02,
+               -1.949151e+02,  1.768619e+02, -7.646077e+01,  4.879767e-04)
 
 # generate only true parameters (weights + lambda) from theta_mle
-basis <- generate_trig_basis(15, 1)
-logit_w_sf <- theta_mle[-c(1,5)]%*%basis
+basis1 <- generate_trig_basis(15, 1)
+basis2 <- generate_trig_basis(365, 1)
 
-# get w
-w_sf <- exp(logit_w_sf)/(1+exp(logit_w_sf))
+logit_w_ff <- theta_mle[-c(4:7)]%*%basis1
+logit_v_ff <- theta_mle[-c(1:3, 7)]%*%basis2
+
+# get w and v
+w_ff <- exp(logit_w_ff)/(1+exp(logit_w_ff))
+v_ff <- exp(logit_v_ff)/(1+exp(logit_v_ff))
 
 # new theta
-theta_sf <- c(theta_mle[1], w_sf, theta_mle[5])
+theta_ff <- c(w_ff, v_ff, theta_mle[7])
 
 
 
@@ -65,10 +66,10 @@ theta_sf <- c(theta_mle[1], w_sf, theta_mle[5])
 
 # Code predictor - last summer --------------------------------------------
 # constants
-n <- nrow(d_sf)
-sigma_sf <- gcalc_corr_scalar(d_sf[,-1], theta_sf[-17]) + 
-    diag(x = theta_sf[17], nrow = n, ncol = n)
-sigma_sf_inv <- solve(sigma_sf)
+n <- nrow(d_ff)
+sigma_ff <- gcalc_corr_scalar(d_ff[,-1], theta_ff[-381]) + 
+    diag(x = theta_ff[381], nrow = n, ncol = n)
+sigma_ff_inv <- solve(sigma_ff)
 
 
 # functions
@@ -77,11 +78,11 @@ calc_sigma_star <- function(d, xhat, mle) {
     y <- ncol(d)
     res <- c()
     for (i in 1:n) {
-        res[i] <- exp(-sum(mle[-17]*(d[i,-y] - unlist(xhat))^2))
+        res[i] <- exp(-sum(mle[-381]*(d[i,-y] - unlist(xhat))^2))
         # check all vectors if the same
-        if (sum(d[i,-y] == unlist(xhat)) == 16) {
+        if (sum(d[i,-y] == unlist(xhat)) == 380) {
             # add nugget
-            res[[i]] <- res[[i]] + mle[17]
+            res[[i]] <- res[[i]] + mle[381]
         }
     }
     return(res)
@@ -89,19 +90,19 @@ calc_sigma_star <- function(d, xhat, mle) {
 
 
 
-emulate_soil_loss <- function(d, xhat, mle, sigma_sf_inv) {
+emulate_soil_loss <- function(d, xhat, mle, sigma_ff_inv) {
     # this code emulates soil loss: y*/y >> mean as a prediction
     sigma_star <- calc_sigma_star(d, xhat, mle)
     
     # yhat = sigma_star'sigma^{-1}y
-    yhat <- sigma_star%*%sigma_sf_inv%*%d[,17]
+    yhat <- sigma_star%*%sigma_ff_inv%*%d[,381]
     return(yhat)
 }
 
 
 # example
-xhat <- d_sf_emulator[1,-1]
-emulate_soil_loss(d_sf[,-1], xhat, theta_sf, sigma_sf_inv)
+xhat <- d_ff_emulator[1,-c(1:4)]
+emulate_soil_loss(d_ff[,-1], xhat, theta_ff, sigma_ff_inv)
 
 
 
@@ -110,26 +111,15 @@ emulate_soil_loss(d_sf[,-1], xhat, theta_sf, sigma_sf_inv)
 # Emulate -----------------------------------------------------------------
 ## emulator
 soil_loss <- c()
-nhat <- nrow(d_sf_emulator)
+nhat <- nrow(d_ff_emulator)
 for (i in 1:nhat) {
-    soil_loss[i] <- emulate_soil_loss(d_sf[,-1], 
-                                      d_sf_emulator[i, -1], 
-                                      theta_sf,
-                                      sigma_sf_inv)
+    soil_loss[i] <- emulate_soil_loss(d_ff[,-1], 
+                                      d_ff_emulator[i, -c(1:4)], 
+                                      theta_ff,
+                                      sigma_ff_inv)
 }
 
-d_sf_emulator <- cbind(d_sf_emulator, soil_loss)
-
-# restandardize precipitaion
-d_sf$total_prcp <- exp(d_sf$total_prcp) - 637.56
-
-# standardize precipitaion
-d_sf_emulator$total_prcp <- exp(d_sf_emulator$total_prcp) - 637.56
-
-# combine all into one
-names(d_sf) <- names(d_sf_emulator) 
-d_sf_mixed <- rbind(d_sf, d_sf_emulator)
-
+d_ff_emulator <- cbind(d_ff_emulator, soil_loss)
 
 
 
@@ -138,66 +128,96 @@ d_sf_mixed <- rbind(d_sf, d_sf_emulator)
 
 
 # Visualization -----------------------------------------------------------
-## wepp data: baswood1 & hill1
-wepp_bsw1 <- d_sf[1:12,-1] %>% ggplot(aes(x = total_prcp, y = soil_loss)) +
-    geom_smooth() + #alternatively use geom_line() or geom_point() 
-    ggtitle("Soil loss distribution for Basswood1 - hill1 slope profile") + 
-    xlab("annual precipitation (mm)") +
-    ylab("annual soil loss (kg/m^2)")
-wepp_bsw1
+## filter wepp data
+wepp_soil_loss <- d %>% filter(year == 2007 | year == 2018) %>% 
+    select(watershed, hill, year, soil_loss) %>% 
+    transmute(hillslope = paste(watershed, hill),
+              soil_loss = soil_loss,
+              year = year,
+              type = "wepp")
 
-## wepp data: orbweaver2 & hill3
-wepp_orb3 <- d_sf[385:396,-1] %>% ggplot(aes(x = total_prcp, y = soil_loss)) +
-    geom_smooth() +
-    ggtitle("Soil loss distribution for Orbweaver2 - hill3 slope profile") + 
-    xlab("annual precipitation (mm)") +
-    ylab("annual soil loss (kg/m^2)")
-wepp_orb3
+## wepp: year 2007 & 2018
+wepp2007 <- wepp_soil_loss %>% 
+    filter(year == 2007) %>% 
+    ggplot(aes(x = hillslope, y = soil_loss)) +
+    geom_bar(stat = "identity") +
+    ggtitle("Annual soil loss distribution in 2007") +
+    ylab("soil loss (kg/m^2)") +
+    xlab("WEPP") +
+    theme_light() +
+    coord_flip()
+wepp2007
 
-## emulator data: baswood1 & hill1
-em_bsw1 <- d_sf_emulator[1:12,-1] %>% ggplot(aes(x = total_prcp, y = soil_loss)) +
-    geom_smooth() + 
-    ggtitle("Soil loss distribution for Basswood1 - hill1 slope profile") + 
-    xlab("annual precipitation (mm)") +
-    ylab("annual soil loss (kg/m^2)")
-em_bsw1
+wepp2018 <- wepp_soil_loss %>% 
+    filter(year == 2018) %>% 
+    ggplot(aes(x = hillslope, y = soil_loss)) +
+    geom_bar(stat = "identity") +
+    ggtitle("Annual soil loss distribution in 2018") +
+    ylab("soil loss (kg/m^2)") +
+    xlab("WEPP")
+    theme_light() +
+    coord_flip()
+wepp2018
 
-## emulator data: orbweaver2 & hill3
-em_orb3 <- d_sf_emulator[13:24,-1] %>% ggplot(aes(x = total_prcp, y = soil_loss)) +
-    geom_smooth() +
-    ggtitle("Soil loss distribution for Orbweaver2 - hill3 slope profile") + 
-    xlab("annual precipitation (mm)") +
-    ylab("annual soil loss (kg/m^2)")
-em_orb3
+# filter emulator data
+emulator_soil_loss <- d_ff_emulator %>%
+    select(watershed, hill, year, soil_loss) %>% 
+    mutate(hillslope = paste(watershed, hill),
+           type = "emulator")
+
+## emulator: year 2007 & 2018
+emulator2007 <- emulator_soil_loss %>% 
+    filter(year == 2007) %>% 
+    ggplot(aes(x = hillslope, y = soil_loss)) +
+    geom_bar(stat = "identity") +
+    ylab("soil loss (kg/m^2)") + 
+    xlab("Emulator") +
+    theme_light() +
+    coord_flip()
+emulator2007
+
+emulator2018 <- emulator_soil_loss %>% 
+    filter(year == 2018) %>% 
+    ggplot(aes(x = hillslope, y = soil_loss)) +
+    geom_bar(stat = "identity") +
+    ylab("soil loss (kg/m^2)") +
+    xlab("Emulator") +
+    theme_light() +
+    coord_flip()
+emulator2018
+
+# if you want something together (didn't use)
+ggarrange(wepp2007, emulator2007, nrow = 2, align = "v")
+ggarrange(wepp2018, emulator2018, nrow = 2, align = "v")
 
 
-## plot mixed: baswood1 & hill1
-d_sf_mixed[c(1:12, 433:444),] %>% ggplot(aes(x = total_prcp, 
-                                             y = soil_loss,
-                                             color = type)) +
-    geom_smooth() + #alternatively use geom_line() or geom_point() 
-    ggtitle("Soil loss distribution for Basswood1 - hill1 slope profile") + 
-    xlab("annual precipitation (mm)") +
-    ylab("annual soil loss (kg/m^2)") +
-    theme_linedraw()
+# mix the datasets
+d_ff_mixed <-rbind(wepp_soil_loss, emulator_soil_loss[,-c(1:2)])
+
+## plot mixed: year 2007
+d_ff_mixed %>% filter(year == 2007) %>% 
+    ggplot(aes(x = hillslope, y = soil_loss, color = type)) +
+    geom_bar(stat = "identity") +
+    ggtitle("Annual soil loss distribution in 2007") +
+    ylab("soil loss (kg/m^2)") +
+    theme_light() +
+    coord_flip()
 
 # publish
-dev.copy(pdf,'bwd1_sf.pdf')
+dev.copy(pdf,'ff_2007.pdf')
 dev.off()
 
-
-## plot mixed: orbweaver2 & hill3
-d_sf_mixed[c(385:396, 445:456),] %>% ggplot(aes(x = total_prcp, 
-                                                y = soil_loss,
-                                                color = type)) +
-    geom_smooth() + #alternatively use geom_line() or geom_point() 
-    ggtitle("Soil loss distribution for Orbweaver2 - hill3 slope profile") + 
-    xlab("annual precipitation (mm)") +
-    ylab("annual soil loss (kg/m^2)") +
-    theme_linedraw()
+## plot mixed: year 2018
+d_ff_mixed %>% filter(year == 2018) %>% 
+    ggplot(aes(x = hillslope, y = soil_loss, color = type)) +
+    geom_bar(stat = "identity") +
+    ggtitle("Annual soil loss distribution in 2018") +
+    ylab("soil loss (kg/m^2)") +
+    theme_light() +
+    coord_flip()
 
 # publish
-dev.copy(pdf,'prcp.pdf')
+dev.copy(pdf,'ff_2018.pdf')
 dev.off()
 
 
