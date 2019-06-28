@@ -33,11 +33,10 @@ years <- d[-c(4)] %>%
 
 # add 0.000001 to each year
 d_ff_emulator <- data.frame(type = "emulator",
-                            years
-                            )
+                            years)
 
-# add small difference
-d_ff_emulator[,-c(1:5, 370:384)] <- d_ff_emulator[,-c(1:5, 370:384)] + 10^(-6)
+# add small difference (no need for now)
+d_ff_emulator[,-c(1:5, 370:384)] <- d_ff_emulator[,-c(1:5, 370:384)]
 
 
 
@@ -129,7 +128,7 @@ d_ff_emulator <- cbind(d_ff_emulator, soil_loss)
 
 # Visualization -----------------------------------------------------------
 ## filter wepp data
-wepp_soil_loss <- d %>% filter(year == 2007 | year == 2018) %>% 
+wepp_soil_loss <- d %>% filter(year == 2017 | year == 2018) %>% 
     select(watershed, hill, year, soil_loss) %>% 
     transmute(hillslope = paste(watershed, hill),
               soil_loss = soil_loss,
@@ -138,7 +137,7 @@ wepp_soil_loss <- d %>% filter(year == 2007 | year == 2018) %>%
 
 ## wepp: year 2007 & 2018
 wepp2007 <- wepp_soil_loss %>% 
-    filter(year == 2007) %>% 
+    filter(year == 2017) %>% 
     ggplot(aes(x = hillslope, y = soil_loss)) +
     geom_bar(stat = "identity") +
     ggtitle("Annual soil loss distribution in 2007") +
@@ -197,7 +196,7 @@ d_ff_mixed <-rbind(wepp_soil_loss, emulator_soil_loss[,-c(1:2)])
 ## plot mixed: year 2007
 d_ff_mixed %>% filter(year == 2007) %>% 
     ggplot(aes(x = hillslope, y = soil_loss, color = type)) +
-    geom_bar(stat = "identity") +
+    geom_point() +
     ggtitle("Annual soil loss distribution in 2007") +
     ylab("soil loss (kg/m^2)") +
     theme_light() +
@@ -210,7 +209,7 @@ dev.off()
 ## plot mixed: year 2018
 d_ff_mixed %>% filter(year == 2018) %>% 
     ggplot(aes(x = hillslope, y = soil_loss, color = type)) +
-    geom_bar(stat = "identity") +
+    geom_point(stat = "identity") +
     ggtitle("Annual soil loss distribution in 2018") +
     ylab("soil loss (kg/m^2)") +
     theme_light() +
