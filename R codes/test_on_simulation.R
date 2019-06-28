@@ -20,8 +20,8 @@ library(dlm)
 
 # Conventions -------------------------------------------------------------
 ## sample size and Time: T << n
-n <- 432 # for more sample size I am getting more stable estimates!
-Time <- 99 #in reality: T = 10
+n <- 300 # for more sample size I am getting more stable estimates!
+Time <- 19 #in reality: T = 10
 q <- 1 #number of harmonics
 rho <- 0.99
 sigmasq <- 1
