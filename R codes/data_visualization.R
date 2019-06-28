@@ -19,7 +19,7 @@ source("R codes/wepp_data.R")
 
 
 
-# Visualize covariates ----------------------------------------------------
+# Visualize precipitation -------------------------------------------------
 ## add new column = days' order
 climate_for_visual <- climate[-leap,] %>% 
     mutate(days = rep(1:365, 12))
@@ -55,59 +55,7 @@ ggarrange(prcp_2007, prcp_2018, nrow = 2)
 #dev.copy(pdf,'prcp.pdf')
 #dev.off()
 
-
-## plot two hillslope slope profiles: Basswood1 hill1, Orbweaver2 hill3
-slope1 <- num_slope[1, -c(1, 2)] %>% t() %>% 
-    as.data.frame() %>% 
-    mutate(n = 1:15)
-slope2 <- num_slope[33, -c(1, 2)] %>% t() %>% 
-    as.data.frame() %>% 
-    mutate(n = 1:15)
-
-# add hillslope height: standardized height
-slope1$height <-  15:1/slope1$slope
-slope1$height[1] <- 550
-slope2$height <-  15:1/slope2$slope
-slope2$height[1] <- 380
-
-# set correct column names
-colnames(slope1) <- c("slope", "n")
-colnames(slope2) <- c("slope", "n")
-
-# ggplots of slope
-bswd1h1 <- slope1 %>% ggplot(aes(x = n, y = slope)) + 
-    geom_line() + ggtitle("Slope profile of Basswood1 hill1") +
-    xlab("standardized length") + ylab("slope") + 
-    theme_light()
-
-orbw2h3 <- slope2 %>% ggplot(aes(x = n, y = slope)) + 
-    geom_line() + ggtitle("Slope profile of Orbweaver2 hill3") +
-    xlab("standardized length") + ylab("slope") + 
-    theme_light()
-
-# ggplots of heights
-bswd1h1_h <- slope1 %>% ggplot(aes(x = n, y = height)) + 
-    geom_line() + 
-    xlab("standardized length") + ylab("height (m)") + 
-    theme_light()
-
-orbw2h3_h <- slope2 %>% ggplot(aes(x = n, y = height)) + 
-    geom_line() + 
-    xlab("standardized length") + ylab("height (m)") + 
-    theme_light()
-
-
-# combine into one
-ggarrange(bswd1h1, bswd1h1_h, nrow = 2, align = "v")
-ggarrange(orbw2h3, orbw2h3_h, nrow = 2, align = "v")
-
-# publish
-dev.copy(pdf,'bsw_slope.pdf')
-dev.off()
-
-dev.copy(pdf,'orb_slope.pdf')
-dev.off()
-
+### ADD ALL YEARS
 
 
 
@@ -156,11 +104,61 @@ dev.off()
 
 
 # Visualize hillslope by height and slope ---------------------------------
+## plot two hillslope slope profiles: Basswood1 hill1, Orbweaver2 hill3
+slope1 <- num_slope[1, -c(1, 2)] %>% t() %>% 
+    as.data.frame() %>% 
+    mutate(n = 1:15)
+slope2 <- num_slope[33, -c(1, 2)] %>% t() %>% 
+    as.data.frame() %>% 
+    mutate(n = 1:15)
+
+# set correct column names
+colnames(slope1) <- c("slope", "n")
+colnames(slope2) <- c("slope", "n")
+
+# add hillslope height: standardized height
+slope1$height <-  15:1 / slope1$slope
+slope1$height[1] <- 550
+slope2$height <-  15:1/slope2$slope
+slope2$height[1] <- 380
+
+# ggplots of slope
+bswd1h1 <- slope1 %>% ggplot(aes(x = n, y = slope)) + 
+    geom_step() + ggtitle("Slope profile of Basswood1 hill1") +
+    xlab("standardized length") + ylab("slope") + 
+    theme_light()
+
+orbw2h3 <- slope2 %>% ggplot(aes(x = n, y = slope)) + 
+    geom_step() + ggtitle("Slope profile of Orbweaver2 hill3") +
+    xlab("standardized length") + ylab("slope") + 
+    theme_light()
+
+# ggplots of heights
+bswd1h1_h <- slope1 %>% ggplot(aes(x = n, y = height)) + 
+    geom_line() + 
+    xlab("standardized length") + ylab("height (m)") + 
+    theme_light()
+
+orbw2h3_h <- slope2 %>% ggplot(aes(x = n, y = height)) + 
+    geom_line() + 
+    xlab("standardized length") + ylab("height (m)") + 
+    theme_light()
+
+
+# combine into one
+ggarrange(bswd1h1, bswd1h1_h, nrow = 2, align = "v")
+ggarrange(orbw2h3, orbw2h3_h, nrow = 2, align = "v")
+
+# publish
+dev.copy(pdf,'bsw_slope.pdf')
+dev.off()
+
+dev.copy(pdf,'orb_slope.pdf')
+dev.off()
 
 
 
-
-
+### ADD aLL slopes!!!!
 
 
 
