@@ -296,7 +296,8 @@ bswd1h1_mixed <- ggplot() +
 bswd1h1_mixed
 
 # publish
-dev.copy(pdf,'bwd_sf_mixed.pdf')
+#dev.copy(pdf,'bwd_sf_mixed.pdf')
+dev.copy2pdf(out.type = "pdf")
 dev.off()
 
 
@@ -318,6 +319,7 @@ orb2h3_mixed <- ggplot() +
 orb2h3_mixed
 
 # publish
-dev.copy(pdf,'orb_sf_mixed.pdf')
+#dev.copy(pdf,'orb_sf_mixed.pdf')
+dev.copy2pdf(out.type = "pdf")
 dev.off()
 
