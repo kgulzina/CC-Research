@@ -11,6 +11,7 @@ library(lubridate)
 library(ggplot2)
 library(ggthemes)
 library(ggpubr)
+library(dplyr)
 
 
 
@@ -285,11 +286,52 @@ dev.off()
 
 
 ### ADD aLL slopes!!!!
+slope_profile_maker <- function(n, d) {
+    slopes <- d[n, -c(1, 2)] %>% t() %>% 
+        as.data.frame() %>% 
+        mutate(nend = c(2:15, NA),
+               n = 1:15)
+    
+    # set correct column names
+    colnames(slopes) <- c("slope", "nend", "n") 
+    
+    # add hillslope height: standardized height
+    slopes$height <-  15:1 / slopes$slope
+    slopes$height[1] <- slopes$height[2]
+    
+    # add y end
+    slopes$yend <- slopes$slope
+    
+    plot1 <- slopes %>% 
+        ggplot(aes(x = n, y = slope, xend = nend, yend = yend)) +
+        geom_vline(aes(xintercept = n), linetype = 2, color = "grey") +
+        geom_point() + xlab("") +
+        geom_point(aes(x = nend, y = slope), shape = 1) +  
+        ggtitle("Slope profile of Orbweaver 3 hill 3") +
+        geom_segment() + theme_light()
+    
+    
+    
+    plot2 <- slopes %>% ggplot(aes(x = n, y = height)) + 
+        geom_line() + 
+        geom_vline(aes(xintercept = n), linetype = 2, color = "grey") +
+        xlab("standardized length") + ylab("height (m)") + 
+        theme_light() 
+    
+    plot <- ggarrange(plot1, plot2, nrow = 2, align = "v")
+    
+    return(plot)
+}
+
+orb3h3 <- slope_profile_maker(36, num_slope)
+orb3h3
+
+ggarrange(orb3h1, orb3h2, orb3h3, nrow = 3)
 
 
-
-
-
+# publish
+dev.copy(pdf, "orb3.pdf")
+dev.off()
 
 
 
