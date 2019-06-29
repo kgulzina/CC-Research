@@ -24,7 +24,7 @@ source("R codes/wepp_data.R")
 climate_for_visual <- climate[-leap,] %>% 
     mutate(days = rep(1:365, 12))
 
-## standardize prcp if needed: Dr. Niemi ????
+## standardize prcp if needed: Dr. Niemi (don't need!)
 # standardize prcp: by taking log(prcp + smallest non-zero prcp)
 for (i in 2007:2018) {
     rows <- which(climate_for_visual$year == i)
@@ -37,25 +37,145 @@ for (i in 2007:2018) {
 prcp_2007 <- climate_for_visual %>% filter(year == 2007) %>% 
     select(days, prcp) %>% 
     ggplot(aes(x = days, y = prcp)) + 
-    geom_line() + ggtitle("Daily precipitation in 2007") +
-    xlab("consecutive days") + ylab("precipitation (mm)") + 
-    theme_light()
+    geom_point(col = "blue") + 
+    geom_line(aes(x = days, y = prcp, alpha = 0.001), col = "#73DCFF") +
+    ggtitle("Daily precipitation in 2007") +
+    xlab("") + ylab("") + 
+    theme_light() + scale_alpha(guide = "none")
+prcp_2007
 
 prcp_2018 <- climate_for_visual %>% filter(year == 2018) %>% 
     select(days, prcp) %>% 
     ggplot(aes(x = days, y = prcp)) + 
-    geom_line() + ggtitle("Daily precipitation in 2018") +
-    xlab("consecutive days") + ylab("precipitation (mm)") + 
-    theme_linedraw()
+    geom_point(col = "blue") + 
+    geom_line(aes(x = days, y = prcp, alpha = 0.001), col = "#73DCFF") +
+    ggtitle("Daily precipitation in 2018") +
+    xlab("") + ylab("") +
+    theme_light() + scale_alpha(guide = "none")
 
 # combine into one
 ggarrange(prcp_2007, prcp_2018, nrow = 2)
 
 # publish
 #dev.copy(pdf,'prcp.pdf')
+dev.copy2pdf(out.type = "pdf")
+dev.off()
+
+### ADD ALL YEARS : Write a function here later!!!!!
+prcp_2008 <- climate_for_visual %>% filter(year == 2008) %>% 
+    select(days, prcp) %>% 
+    ggplot(aes(x = days, y = prcp)) + 
+    geom_point(col = "blue") + 
+    geom_line(aes(x = days, y = prcp, alpha = 0.001), col = "#73DCFF") +
+    ggtitle("Daily precipitation in 2008") +
+    xlab("") + ylab("") +
+    theme_light() + scale_alpha(guide = "none")
+
+prcp_2009 <- climate_for_visual %>% filter(year == 2009) %>% 
+    select(days, prcp) %>% 
+    ggplot(aes(x = days, y = prcp)) + 
+    geom_point(col = "blue") + 
+    geom_line(aes(x = days, y = prcp, alpha = 0.001), col = "#73DCFF") +
+    ggtitle("Daily precipitation in 2009") +
+    xlab("") + ylab("") + 
+    theme_light() + scale_alpha(guide = "none")
+
+prcp_2010 <- climate_for_visual %>% filter(year == 2010) %>% 
+    select(days, prcp) %>% 
+    ggplot(aes(x = days, y = prcp)) + 
+    geom_point(col = "blue") + 
+    geom_line(aes(x = days, y = prcp, alpha = 0.001), col = "#73DCFF") +
+    ggtitle("Daily precipitation in 2010") +
+    xlab("") + ylab("") + 
+    theme_light() + scale_alpha(guide = "none")
+
+prcp_2011 <- climate_for_visual %>% filter(year == 2011) %>% 
+    select(days, prcp) %>% 
+    ggplot(aes(x = days, y = prcp)) + 
+    geom_point(col = "blue") + 
+    geom_line(aes(x = days, y = prcp, alpha = 0.001), col = "#73DCFF") +
+    ggtitle("Daily precipitation in 2011") +
+    xlab("") + ylab("") + 
+    theme_light() + scale_alpha(guide = "none")
+
+prcp_2012 <- climate_for_visual %>% filter(year == 2012) %>% 
+    select(days, prcp) %>% 
+    ggplot(aes(x = days, y = prcp)) + 
+    geom_point(col = "blue") + 
+    geom_line(aes(x = days, y = prcp, alpha = 0.001), col = "#73DCFF") +
+    ggtitle("Daily precipitation in 2012") +
+    xlab("") + ylab("") + 
+    theme_light() + scale_alpha(guide = "none")
+
+prcp_2013 <- climate_for_visual %>% filter(year == 2013) %>% 
+    select(days, prcp) %>% 
+    ggplot(aes(x = days, y = prcp)) + 
+    geom_point(col = "blue") + 
+    geom_line(aes(x = days, y = prcp, alpha = 0.001), col = "#73DCFF") +
+    ggtitle("Daily precipitation in 2013") +
+    xlab("") + ylab("") + 
+    theme_light() + scale_alpha(guide = "none")
+
+prcp_2014 <- climate_for_visual %>% filter(year == 2014) %>% 
+    select(days, prcp) %>% 
+    ggplot(aes(x = days, y = prcp)) + 
+    geom_point(col = "blue") + 
+    geom_line(aes(x = days, y = prcp, alpha = 0.001), col = "#73DCFF") +
+    ggtitle("Daily precipitation in 2014") +
+    xlab("") + ylab("") + 
+    theme_light() + scale_alpha(guide = "none")
+
+prcp_2015 <- climate_for_visual %>% filter(year == 2015) %>% 
+    select(days, prcp) %>% 
+    ggplot(aes(x = days, y = prcp)) + 
+    geom_point(col = "blue") + 
+    geom_line(aes(x = days, y = prcp, alpha = 0.001), col = "#73DCFF") +
+    ggtitle("Daily precipitation in 2015") +
+    xlab("") + ylab("") + 
+    theme_light() + scale_alpha(guide = "none")
+
+prcp_2016 <- climate_for_visual %>% filter(year == 2016) %>% 
+    select(days, prcp) %>% 
+    ggplot(aes(x = days, y = prcp)) + 
+    geom_point(col = "blue") + 
+    geom_line(aes(x = days, y = prcp, alpha = 0.001), col = "#73DCFF") +
+    ggtitle("Daily precipitation in 2016") +
+    xlab("") + ylab("") + 
+    theme_light() + scale_alpha(guide = "none")
+
+prcp_2017 <- climate_for_visual %>% filter(year == 2017) %>% 
+    select(days, prcp) %>% 
+    ggplot(aes(x = days, y = prcp)) + 
+    geom_point(col = "blue") + 
+    geom_line(aes(x = days, y = prcp, alpha = 0.001), col = "#73DCFF") +
+    ggtitle("Daily precipitation in 2017") +
+    xlab("") + ylab("") + 
+    theme_light() + scale_alpha(guide = "none")
+
+# arrange all plots from 2007 to 2012
+prcp_07_12 <- ggarrange(prcp_2007, prcp_2008, prcp_2009, 
+          prcp_2010, prcp_2011, prcp_2012,
+          nrow = 6)
+## add same x and y labels
+annotate_figure(prcp_07_12, 
+                left = text_grob("daily precipitation (mm)", rot = 90),
+                bottom = text_grob("consecutive days"))
+## publish
+#dev.copy(pdf, "prcp0712.pdf")
 #dev.off()
 
-### ADD ALL YEARS
+# arrange all plots from 2013 to 2018
+prcp_13_18 <- ggarrange(prcp_2013, prcp_2014, prcp_2015, 
+                        prcp_2016, prcp_2017, prcp_2018,
+                        nrow = 6)
+## add same x and y labels
+annotate_figure(prcp_13_18, 
+                left = text_grob("daily precipitation (mm)", rot = 90),
+                bottom = text_grob("consecutive days"))
+## publish
+#dev.copy(pdf, "prcp1318.pdf")
+#dev.off()
+
 
 
 
@@ -69,15 +189,18 @@ soil1 <- soil_loss %>% filter(watershed == "Basswood1",
                               hill == "hill1") %>% 
     select(soil_loss, year) %>% 
     ggplot(aes(x = year, y = soil_loss)) + 
-    geom_point(size = 2) + ggtitle("Soil loss for Basswood1 hill1") +
+    geom_bar(stat = "identity") + 
+    ggtitle("Soil loss for Basswood1 hill1") +
     xlab("year") + ylab("soil loss (kg/m^2)") + 
     theme_light()
+soil1
 
 soil2 <- soil_loss %>% filter(watershed == "Orbweaver2",
                               hill == "hill3") %>% 
     select(soil_loss, year) %>% 
     ggplot(aes(x = year, y = soil_loss)) + 
-    geom_point(size = 2) + ggtitle("Soil loss for Orbweaver2 hill3") +
+    geom_bar(stat = "identity") + 
+    ggtitle("Soil loss for Orbweaver2 hill3") +
     xlab("year") + ylab("soil loss (kg/m^2)") + 
     theme_light()
 
@@ -85,7 +208,8 @@ soil2 <- soil_loss %>% filter(watershed == "Orbweaver2",
 ggarrange(soil1, soil2, nrow = 2)
 
 # publish
-dev.copy(pdf,'soil_loss.pdf')
+#dev.copy(pdf,'soil_loss.pdf')
+#dev.copy2pdf(out.type = "pdf")
 dev.off()
 
 
@@ -96,8 +220,10 @@ soil_loss %>% ggplot(aes(y = soil_loss, x = year)) +
     theme_light()
 
 # publish
-dev.copy(pdf,'soil_loss_all.pdf')
+#dev.copy(pdf,'soil_loss_all.pdf')
+#dev.copy2pdf(out.type = "pdf")
 dev.off()
+
 
 
 
