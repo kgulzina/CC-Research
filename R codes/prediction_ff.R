@@ -23,20 +23,19 @@ d_ff <- data.frame(type = "wepp",
                    soil_loss = d[,4])
 
 # choose years 2007 & 2018, and all slope profiles
-slope_profiles <- unique(d[,370:384])
-watersheds <- rep(unique(d$watershed), each = 3)
-
-hills <- d %>% filter(year == 2007) %>% select(hill)
+#slope_profiles <- unique(d[,370:384])
+#watersheds <- rep(unique(d$watershed), each = 3)
+#hills <- d %>% filter(year == 2007) %>% select(hill)
 years <- d[-c(4)] %>% 
     unique() %>% 
     filter( year == 2007 | year == 2018) 
 
 # add 0.000001 to each year
-d_ff_emulator <- data.frame(type = "emulator",
-                            years)
+d_ff_emulator <- data.frame(type = "emulated",
+                            d[,-4])
 
 # add small difference (no need for now)
-d_ff_emulator[,-c(1:5, 370:384)] <- d_ff_emulator[,-c(1:5, 370:384)]
+#d_ff_emulator[,-c(1:5, 370:384)] <- d_ff_emulator[,-c(1:5, 370:384)]
 
 
 
@@ -109,17 +108,57 @@ emulate_soil_loss(d_ff[,-1], xhat, theta_ff, sigma_ff_inv)
 
 # Emulate -----------------------------------------------------------------
 ## emulator
-soil_loss <- c()
+soil_loss_ff <- c()
 nhat <- nrow(d_ff_emulator)
 for (i in 1:nhat) {
-    soil_loss[i] <- emulate_soil_loss(d_ff[,-1], 
+    soil_loss_ff[i] <- emulate_soil_loss(d_ff[,-1], 
                                       d_ff_emulator[i, -c(1:4)], 
                                       theta_ff,
                                       sigma_ff_inv)
 }
-
+soil_loss <- soil_loss_ff
 d_ff_emulator <- cbind(d_ff_emulator, soil_loss)
 
+# for back up save the data set
+#write.csv(d_ff_emulator, file = "d_ff_emulator.csv")
+
+
+
+
+
+
+# Add SE ------------------------------------------------------------------
+## write a function to find CI borders
+ci_ff <- function(d, xhat, mle, sigma_ff_inv, mean_ff) {
+    sigma_star <- calc_sigma_star(d, xhat, mle)
+    
+    # calculate variance
+    var <- 1 + mle[381] - sigma_star%*%sigma_ff_inv%*%sigma_star
+    
+    # get sample of 1000
+    ss <- rnorm(1000, mean = mean_ff, sd = sqrt(var))
+    
+    # get quantiles
+    res <- quantile(ss, probs = c(0.025, 0.975), na.rm = TRUE)
+    return(res)
+}
+
+
+# example
+ci_ff(d_ff[,-1], d_ff_emulator[1,-c(1:4, 385)], 
+      theta_ff, sigma_ff_inv, soil_loss_ff[1] )
+
+## add CI for the whole xgrid
+nhat <- nrow(d_ff_emulator)
+for (i in 1:nhat) {
+    ci <- ci_sf(d_ff[,-1], 
+                d_ff_emulator[i, -c(1:4, 385)], 
+                theta_ff,
+                sigma_ff_inv,
+                soil_loss_ff[i])
+    d_ff_emulator$q1[i] <- ci[1]
+    d_ff_emulator$q2[i] <- ci[2]
+}
 
 
 
@@ -128,9 +167,8 @@ d_ff_emulator <- cbind(d_ff_emulator, soil_loss)
 
 # Visualization -----------------------------------------------------------
 ## filter wepp data
-wepp_soil_loss <- d %>% filter(year == 2017 | year == 2018) %>% 
-    select(watershed, hill, year, soil_loss) %>% 
-    transmute(hillslope = paste(watershed, hill),
+wepp_soil_loss <- d %>% dplyr::select(watershed, hill, year, soil_loss) %>% 
+    mutate(hillslope = paste(watershed, hill),
               soil_loss = soil_loss,
               year = year,
               type = "wepp")
@@ -160,7 +198,7 @@ wepp2018
 
 # filter emulator data
 emulator_soil_loss <- d_ff_emulator %>%
-    select(watershed, hill, year, soil_loss) %>% 
+    dplyr::select(watershed, hill, year, soil_loss) %>% 
     mutate(hillslope = paste(watershed, hill),
            type = "emulator")
 
@@ -191,32 +229,46 @@ ggarrange(wepp2018, emulator2018, nrow = 2, align = "v")
 
 
 # mix the datasets
-d_ff_mixed <-rbind(wepp_soil_loss, emulator_soil_loss[,-c(1:2)])
+d_ff_mixed <-rbind(wepp_soil_loss, emulator_soil_loss)
 
 ## plot mixed: year 2007
+label1 <- wepp_soil_loss %>% filter(year == 2007) %>% dplyr::select(soil_loss) -
+    emulator_soil_loss %>% filter(year == 2007) %>% dplyr::select(soil_loss)
+
+
 d_ff_mixed %>% filter(year == 2007) %>% 
-    ggplot(aes(x = hillslope, y = soil_loss, color = type)) +
+    mutate(label = rep(label1$soil_loss, 2)) %>% 
+    ggplot(aes(x = hillslope, y = soil_loss, 
+               shape = type, color = type, label = label)) +
     geom_point() +
     ggtitle("Annual soil loss distribution in 2007") +
     ylab("soil loss (kg/m^2)") +
     theme_light() +
-    coord_flip()
+    coord_flip() + geom_text(size = 2, hjust = -0.05, col = "black")
 
 # publish
-dev.copy(pdf,'ff_2007.pdf')
-dev.off()
+#dev.copy(pdf,'ff_2007.pdf')
+#dev.copy2pdf(out.type = "pdf")
+#dev.off()
 
 ## plot mixed: year 2018
+label2 <- wepp_soil_loss %>% filter(year == 2018) %>% dplyr::select(soil_loss) -
+    emulator_soil_loss %>% filter(year == 2018) %>% dplyr::select(soil_loss)
+
 d_ff_mixed %>% filter(year == 2018) %>% 
-    ggplot(aes(x = hillslope, y = soil_loss, color = type)) +
-    geom_point(stat = "identity") +
+    mutate(label = rep(label2$soil_loss, 2)) %>% 
+    ggplot(aes(x = hillslope, y = soil_loss, 
+               shape = type, color = type, label = label)) +
+    geom_point() +
     ggtitle("Annual soil loss distribution in 2018") +
     ylab("soil loss (kg/m^2)") +
     theme_light() +
-    coord_flip()
+    coord_flip() + geom_text(size = 2, hjust = -0.05, col = "black")
 
 # publish
-dev.copy(pdf,'ff_2018.pdf')
+#dev.copy(pdf,'ff_2018.pdf')
+#dev.copy2pdf(out.type = "pdf")
+dev.copy2pdf(out.type = "pdf")
 dev.off()
 
 
