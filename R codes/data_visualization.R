@@ -307,7 +307,7 @@ slope_profile_maker <- function(n, d) {
         geom_vline(aes(xintercept = n), linetype = 2, color = "grey") +
         geom_point() + xlab("") +
         geom_point(aes(x = nend, y = slope), shape = 1) +  
-        ggtitle("Slope profile of Orbweaver 3 hill 3") +
+        ggtitle("Slope profile of Interim 3 hill 2") +
         geom_segment() + theme_light()
     
     
@@ -323,14 +323,14 @@ slope_profile_maker <- function(n, d) {
     return(plot)
 }
 
-orb3h3 <- slope_profile_maker(36, num_slope)
-orb3h3
+int3h2 <- slope_profile_maker(27, num_slope)
+int3h2
 
-ggarrange(orb3h1, orb3h2, orb3h3, nrow = 3)
+ggarrange(int2h4, int3h1, int3h2, nrow = 3)
 
 
 # publish
-dev.copy(pdf, "orb3.pdf")
+dev.copy(pdf, "int3.pdf")
 dev.off()
 
 
