@@ -47,8 +47,8 @@ d_sf_emulator <- cbind(d_sf_emulator,
 
 # MLE estimates -----------------------------------------------------------
 # new best
-theta_mle_sf <- c(55.06167167, -402.44309188, 
-                  -12.67886639,  386.78739175,  0.00197348)
+theta_mle_sf <- c(55.06178476, -402.44308979,  -12.52226301,
+                  386.78732588,    0.00197214)
 
 # lkl = 5.490827e+169
 #theta_mle <- c(0.011126216, -25.682813936, 4.347803503, 
@@ -303,7 +303,7 @@ dev.off()
 
 # orbweaver2 hill3
 orb2h3_mixed <- ggplot() +
-    geom_point(data = d_sf[13:24,], 
+    geom_point(data = d_sf[385:396,], 
                aes(x = total_prcp, y = soil_loss, colour = "wepp")) +
     geom_line(data = d_sf_emulator[41:80,],
               aes(x = total_prcp, y = soil_loss, colour = "emulated")) +
