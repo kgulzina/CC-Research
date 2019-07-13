@@ -216,13 +216,15 @@ dev.off()
 
 ## soil_loss all in all
 soil_loss %>% ggplot(aes(y = soil_loss, x = year)) + 
-    geom_boxplot() + ggtitle("Annual soil loss amount for 36 hillslopes") +
+    geom_boxplot(fill = "grey", outlier.alpha = 0) + 
+    ggtitle("Annual soil loss amount for 36 hillslopes") +
     xlab("year") + ylab("soil loss (kg/m^2)") + 
+    #geom_jitter(alpha = 0.3) +
     theme_light()
 
 # publish
 #dev.copy(pdf,'soil_loss_all.pdf')
-#dev.copy2pdf(out.type = "pdf")
+dev.copy2pdf(out.type = "pdf")
 dev.off()
 
 
