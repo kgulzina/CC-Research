@@ -253,6 +253,10 @@ for (i in 1:nhat) {
     d_sf_emulator$q2[i] <- ci[2]
 }
 
+# making the confidence intervals at the end points the same
+d_sf_emulator$q1[80] <- d_sf_emulator$soil_loss[80]
+d_sf_emulator$q2[80] <- d_sf_emulator$soil_loss[80]
+
 
 
 
