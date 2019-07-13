@@ -154,9 +154,9 @@ ggarrange(sim, em, nrow = 2)
 # scatter plot of mixed as in FF
 cols_sm <- c("simulated"="#f04546", "emulated"="#17202A")
 sm <- ggplot() +
-    geom_point(data = d_sim, size = 2.5,
+    geom_point(data = d_sim[1:50,], size = 2.5,
                aes(x = id, y = y, colour = "simulated")) +
-    geom_line(data = d_sim_emulator, 
+    geom_point(data = d_sim_emulator, 
               aes(x = id, y = y, colour = "emulated")) +
     # to remove legend for size
     scale_size(guide = "none") +
@@ -166,8 +166,8 @@ sm <- ggplot() +
 sm    
 
 # publish
-#dev.copy2pdf(out.type = "pdf")
-#dev.off()
+dev.copy2pdf(out.type = "pdf")
+dev.off()
 
 
 
